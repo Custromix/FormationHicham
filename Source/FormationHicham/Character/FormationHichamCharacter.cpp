@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FormationHichamCharacter.h"
-#include "FormationHichamProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -10,6 +9,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
+#include "FormationHicham/Weapons/WeaponStarter/FormationHichamProjectile.h"
+#include "GameFramework/GameSession.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -38,6 +39,16 @@ AFormationHichamCharacter::AFormationHichamCharacter()
 
 }
 
+void AFormationHichamCharacter::Fire()
+{
+
+	int32 SizeX, SizeY;
+	GetNetOwningPlayer()->PlayerController->GetViewportSize(SizeX, SizeY);
+	//GetController()->GetPla
+	if (MainWeapon)
+		MainWeapon->Fire(FVector(SizeX, SizeY, 0.0f));
+}
+
 void AFormationHichamCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -60,6 +71,8 @@ void AFormationHichamCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFormationHichamCharacter::Look);
+		
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AFormationHichamCharacter::Fire);
 	}
 	else
 	{

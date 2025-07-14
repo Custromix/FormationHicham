@@ -2,8 +2,8 @@
 
 
 #include "TP_WeaponComponent.h"
-#include "FormationHichamCharacter.h"
 #include "FormationHichamProjectile.h"
+#include "../../Character/FormationHichamCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -18,16 +18,40 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 {
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
+
+	SetIsReplicatedByDefault(true);
+	AlwaysLoadOnClient = true;
 }
 
 
 void UTP_WeaponComponent::Fire()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, "Client");
+	// Try and play the sound if specified
+	ServerHandleFire();
+
 	if (Character == nullptr || Character->GetController() == nullptr)
 	{
 		return;
 	}
 
+	if (FireSound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+	}
+	
+	// Try and play a firing animation if specified
+	if (FireAnimation != nullptr)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+
+	/*
 	// Try and fire a projectile
 	if (ProjectileClass != nullptr)
 	{
@@ -46,24 +70,41 @@ void UTP_WeaponComponent::Fire()
 			// Spawn the projectile at the muzzle
 			World->SpawnActor<AFormationHichamProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
-	}
+	}*/
 	
-	// Try and play the sound if specified
-	if (FireSound != nullptr)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
-	}
 	
-	// Try and play a firing animation if specified
-	if (FireAnimation != nullptr)
+}
+
+void UTP_WeaponComponent::ServerHandleFire_Implementation()
+{
+	
+	if (ProjectileClass != nullptr)
 	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
-		if (AnimInstance != nullptr)
+		UWorld* const World = GetWorld();
+		if (World != nullptr)
 		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
+			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
+	
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters Params;
+			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			Params.Owner = GetOwner();           // pour le damage instigator
+			Params.Instigator = Cast<APawn>(GetOwner());
+	
+			// Spawn the projectile at the muzzle
+			World->SpawnActor<AFormationHichamProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, Params);
 		}
 	}
+
+}
+
+bool UTP_WeaponComponent::ServerHandleFire_Validate()
+{
+	// Tu peux par ex. vérifier l’angle de visée, la cadence max, etc.
+	return true;
 }
 
 bool UTP_WeaponComponent::AttachWeapon(AFormationHichamCharacter* TargetCharacter)
@@ -100,6 +141,14 @@ bool UTP_WeaponComponent::AttachWeapon(AFormationHichamCharacter* TargetCharacte
 	}
 
 	return true;
+}
+
+void UTP_WeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Ici pas de variables à répliquer, mais exemple :
+	// DOREPLIFETIME(UWeaponComponent, CurrentAmmo);
 }
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -2,6 +2,8 @@
 
 #include "TP_PickUpComponent.h"
 
+#include "FormationHicham/Character/FormationHichamCharacter.h"
+
 UTP_PickUpComponent::UTP_PickUpComponent()
 {
 	// Setup the Sphere Collision

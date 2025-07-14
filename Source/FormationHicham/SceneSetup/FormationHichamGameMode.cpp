@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FormationHichamGameMode.h"
-#include "FormationHichamCharacter.h"
+#include "../Character/FormationHichamCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 AFormationHichamGameMode::AFormationHichamGameMode()
