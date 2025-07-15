@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FormationHicham/Weapons/WeaponCustom/WeaponBase.h"
+#include "FormationHicham/Weapons/WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "FormationHichamCharacter.generated.h"
@@ -47,10 +47,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* FireAction;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category=Weapons)
 	TArray<AWeaponBase*> WeaponsInventory;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category=Weapons)
 	AWeaponBase* MainWeapon;
 
 private:

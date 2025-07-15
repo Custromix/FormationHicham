@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
@@ -20,10 +21,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputMappingContext* FireMappingContext;
 
-	/** Fire Input Action */
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class AFormationHichamProjectile> ProjectileClass;
-
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	USoundBase* FireSound;
@@ -32,15 +29,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimMontage* FireAnimation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	UStaticMeshComponent* WeaponMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USceneComponent* SceneRoot;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USphereComponent* GrabberCollider;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UCapsuleComponent* GrabberCollider;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USkeletalMeshComponent* WeaponMesh;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+						bool bFromSweep, const FHitResult& SweepResult);
 
 public:
 	// Called every frame
@@ -51,8 +55,5 @@ public:
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerHandleFire(FVector ViewportSize);
-
-	UFUNCTION()
-	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 };

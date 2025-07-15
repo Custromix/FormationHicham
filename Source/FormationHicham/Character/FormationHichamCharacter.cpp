@@ -9,7 +9,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
-#include "FormationHicham/Weapons/WeaponStarter/FormationHichamProjectile.h"
 #include "GameFramework/GameSession.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
