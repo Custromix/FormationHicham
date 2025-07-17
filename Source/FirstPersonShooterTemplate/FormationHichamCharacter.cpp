@@ -44,8 +44,6 @@ void AFormationHichamCharacter::Fire()
 	int32 SizeX, SizeY;
 	GetNetOwningPlayer()->PlayerController->GetViewportSize(SizeX, SizeY);
 	//GetController()->GetPla
-	if (MainWeapon)
-		MainWeapon->Fire(FVector(SizeX, SizeY, 0.0f));
 }
 
 void AFormationHichamCharacter::BeginPlay()

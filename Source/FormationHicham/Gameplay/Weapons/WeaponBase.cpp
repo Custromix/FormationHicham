@@ -4,7 +4,7 @@
 #include "WeaponBase.h"
 
 #include "Components/BoxComponent.h"
-#include "FormationHicham/Character/FormationHichamCharacter.h"
+#include "FormationHicham/Gameplay/Character/HichamCharacter.h"
 
 
 // Sets default values
@@ -49,7 +49,7 @@ void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, OtherComp->GetOwner()->GetClass()->GetName());
 	
-	if (OtherActor->IsA(AFormationHichamCharacter::StaticClass()))
+	if (OtherActor->IsA(AHichamCharacter::StaticClass()))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Overlap detected!"));
 	}

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FirstPersonShooterTemplate/FormationHichamCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "HichamPlayerController.generated.h"
 
@@ -13,4 +14,11 @@ UCLASS()
 class FORMATIONHICHAM_API AHichamPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+protected:
+	UPROPERTY(EditAnywhere, Blueprintable, Category = Input)
+	UInputMappingContext* InputMappingContext;
+
+protected:
+	virtual void BeginPlay() override;
 };
