@@ -51,7 +51,7 @@ void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	
 	if (OtherActor->IsA(AHichamCharacter::StaticClass()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Overlap detected!"));
+		AttachToComponent(OtherActor);
 	}
 }
 

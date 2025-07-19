@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FirstPersonShooterTemplate/FormationHichamCharacter.h"
+#include "FormationHicham/FirstPersonShooterTemplate/FormationHichamCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "HichamPlayerController.generated.h"
 

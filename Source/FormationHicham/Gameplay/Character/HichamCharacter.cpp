@@ -5,7 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "FirstPersonShooterTemplate/FormationHichamCharacter.h"
+#include "FormationHicham/FirstPersonShooterTemplate/FormationHichamCharacter.h"
 
 
 // Sets default values
@@ -36,7 +36,7 @@ void AHichamCharacter::Move(const FInputActionValue& value)
 	if (Controller != nullptr)
 	{
 		AddMovementInput(GetActorForwardVector(), Movement.X);
-		AddMovementInput(GetActorForwardVector(), Movement.Y);
+		AddMovementInput(GetActorRightVector(), Movement.Y);
 	}
 }
 
@@ -47,7 +47,7 @@ void AHichamCharacter::Look(const FInputActionValue& value)
 	if (Controller != nullptr)
 	{
 		AddControllerYawInput(LookAxis.X);
-		AddControllerYawInput(LookAxis.Y);
+		AddControllerPitchInput(LookAxis.Y);
 	}
 }
 
