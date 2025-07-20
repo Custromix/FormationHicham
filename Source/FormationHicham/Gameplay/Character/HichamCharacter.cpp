@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "FormationHicham/FirstPersonShooterTemplate/FormationHichamCharacter.h"
+#include "FormationHicham/Gameplay/Weapons/WeaponBase.h"
 
 
 // Sets default values
@@ -18,8 +19,10 @@ AHichamCharacter::AHichamCharacter()
 	Camera->SetupAttachment(GetCapsuleComponent());
 	Camera->bUsePawnControlRotation = true;
 
-	CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
-	CharacterMesh->SetupAttachment(Camera);
+	CharacterMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
+	CharacterMesh1P->SetupAttachment(Camera);
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHichamCharacter::OnOverlapBegin);
 }
 
 // Called when the game starts or when spawned
@@ -80,3 +83,51 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
+void AHichamCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+										 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+										 bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, OtherComp->GetName());
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, OverlappedComp->GetName());
+
+	if (OtherActor->GetClass() == AWeaponBase::StaticClass())
+	{
+		OtherActor->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, "S_Riffle");
+		SwitchItemByRef(OtherActor);
+	}
+}
+
+bool AHichamCharacter::SwitchItemByRef(AActor* Item)
+{
+	if (Item->GetClass() == AWeaponBase::StaticClass())
+	{
+		if (MainItem != Item)
+		{
+			MainItem = Item;
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool AHichamCharacter::SwitchItemByID(const int32 ItemID)
+{
+	if (Items[ItemID] != MainItem)
+	{
+		MainItem = Items[ItemID];
+		return true;
+	}
+
+	return false;
+}
+
+AActor* AHichamCharacter::GetItemFromInventory(const int32 ItemID)
+{
+	return Items[ItemID];
+}
+
+AActor* AHichamCharacter::GetMainItem() const
+{
+	return MainItem;
+}

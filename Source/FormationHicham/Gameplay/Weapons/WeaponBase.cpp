@@ -18,7 +18,6 @@ AWeaponBase::AWeaponBase()
 	
 	GrabberCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Grabber Collider"));
 	GrabberCollider->SetupAttachment(RootComponent);
-	GrabberCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnOverlapBegin);
 
 	// SkeletalMesh attaché à Root aussi (indépendant de la capsule)
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
@@ -42,19 +41,6 @@ void AWeaponBase::Fire(FVector ViewportSize)
 {
 	ServerHandleFire(ViewportSize);
 }
-
-void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-										 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-										 bool bFromSweep, const FHitResult& SweepResult)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, OtherComp->GetOwner()->GetClass()->GetName());
-	
-	if (OtherActor->IsA(AHichamCharacter::StaticClass()))
-	{
-		AttachToComponent(OtherActor);
-	}
-}
-
 
 void AWeaponBase::ServerHandleFire_Implementation(FVector ViewportSize)
 {
