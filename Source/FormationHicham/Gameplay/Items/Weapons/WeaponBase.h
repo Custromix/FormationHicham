@@ -3,23 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/SphereComponent.h"
+#include "WeaponDataAsset.h"
+#include "FormationHicham/Gameplay/Items/Item.h"
+#include "FormationHicham/Gameplay/Items/Interface/UsuableInterface.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
 
 UCLASS()
-class FORMATIONHICHAM_API AWeaponBase : public AActor
+class FORMATIONHICHAM_API AWeaponBase : public AItem
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AWeaponBase();
-
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	class UInputMappingContext* FireMappingContext;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
@@ -29,14 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimMontage* FireAnimation;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	USceneComponent* SceneRoot;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UCapsuleComponent* GrabberCollider;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USkeletalMeshComponent* WeaponMesh;
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UWeaponDataAsset> WeaponInfoDataAsset;
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,6 +38,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire(FVector ViewportSize);
+
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void Reload();
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerHandleFire(FVector ViewportSize);

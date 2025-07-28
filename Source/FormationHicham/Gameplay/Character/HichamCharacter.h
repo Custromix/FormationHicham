@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
-#include "FormationHicham/Gameplay/Weapons/WeaponBase.h"
+#include "FormationHicham/Gameplay/Systems/InventoryComponent/InventoryComponent.h"
 #include "GameFramework/Character.h"
 #include "HichamCharacter.generated.h"
 
@@ -25,6 +25,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInventoryComponent* Inventory;
 	
 	/* Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -37,33 +39,33 @@ private:
 	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* FireAction;
+	UInputAction* FirstUseAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* SecondUseAction;
 
-	UPROPERTY()
-	AActor* MainItem;
-
-	UPROPERTY()
-	TArray<AActor*> Items;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* ReloadAction;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void Move(const FInputActionValue& value);
-	void Look(const FInputActionValue& value);
-	void Fire();
-
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	void FirstUse();
+	void SecondUse();
+	void Reload();
+
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 						bool bFromSweep, const FHitResult& SweepResult);
 
-	bool SwitchItemByRef(AActor* Item);
-	bool SwitchItemByID(int32 ItemID);
-	AActor* GetItemFromInventory(int32 ItemID);
-	AActor* GetMainItem() const;
+
 
 public:
 	// Called every frame
