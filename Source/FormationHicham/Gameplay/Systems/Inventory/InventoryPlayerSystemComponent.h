@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InventoryComponent.h"
 #include "Components/ActorComponent.h"
 #include "FormationHicham/Gameplay/Items/Grenade/Grenade.h"
 #include "FormationHicham/Gameplay/Items/Weapons/WeaponBase.h"
@@ -19,8 +18,6 @@ public:
 	// Sets default values for this component's properties
 	UInventoryPlayerSystemComponent();
 
-	
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -30,6 +27,7 @@ public :
 	
 	void AddItem(TObjectPtr<AItem> Item);
 	void SwitchItem(int32 id);
+	void RemoveItemFromInventory(IUsuableInterface* Item);
 
 private:
 	
@@ -39,7 +37,6 @@ private:
 	TArray<TObjectPtr<AGrenade>> GrenadeInventoryComponent;
 	TMap<EAmmoType, int32> AmmoInventoryComponentMap;
 
-	TArray<AItem*> MainInventory;
 
 	IUsuableInterface* MainItem;
 };

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
-#include "FormationHicham/Gameplay/Systems/Inventory/InventoryComponent.h"
 #include "FormationHicham/Gameplay/Systems/Inventory/InventoryPlayerSystemComponent.h"
 #include "GameFramework/Character.h"
 #include "HichamCharacter.generated.h"
@@ -66,11 +65,8 @@ protected:
 						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 						bool bFromSweep, const FHitResult& SweepResult);
 
-
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 };

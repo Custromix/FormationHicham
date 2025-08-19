@@ -7,8 +7,6 @@
 #include "GameFramework/Actor.h"
 #include "Interface/UsuableInterface.h"
 #include "Item.generated.h"
-
-class AHichamCharacter;
  
 UENUM(BlueprintType, Blueprintable)
 enum class EItemType : uint8

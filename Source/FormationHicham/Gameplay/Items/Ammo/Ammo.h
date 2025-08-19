@@ -32,8 +32,8 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = Ammo)
-	EAmmoType GetAmmoType() const { return AmmoType; };
+	EAmmoType GetAmmoType() const { return AmmoType; }
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ammo)
-	int32 GetAmmoAmount() const { return AmmoAmount; };
+	UFUNCTION(BlueprintCallable, Category = Ammo)
+	int32 GetAmmoAmount() { return AmmoAmount; }
 };

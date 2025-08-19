@@ -112,6 +112,7 @@ void AHichamCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OtherActor->GetName());
 		Inventory->AddItem(Item);
-		OtherActor->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, "S_Riffle");
+		Item->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, "S_Riffle");
+		Item->OnGrab();
 	}
 }

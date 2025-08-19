@@ -6,28 +6,28 @@
 #include "UObject/Interface.h"
 #include "UsuableInterface.generated.h"
 
-// This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(Blueprintable)
 class UUsuableInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 /**
- * 
+ * Interface pour objets utilisables
  */
 class FORMATIONHICHAM_API IUsuableInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	virtual void FirstUse(AHichamCharacter* HichamCharacter);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	virtual void SecondUse(AHichamCharacter* HichamCharacter);
+	// Ces fonctions doivent être implémentées dans les classes qui héritent
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
+	void FirstUse(class AHichamCharacter* HichamCharacter);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	virtual void ThirdUse(AHichamCharacter* HichamCharacter);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
+	void SecondUse(class AHichamCharacter* HichamCharacter);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
+	void ThirdUse(class AHichamCharacter* HichamCharacter);
 };

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "FormationHicham/Gameplay/Items/Item.h"
-#include "FormationHicham/Gameplay/Items/UsuableItem.h"
 #include "GrenadeBehaviour/GrenadeBehaviour.h"
 #include "Grenade.generated.h"
 
@@ -28,7 +27,7 @@ protected:
 public:
 	TObjectPtr<UGrenadeBehaviour> GetGrenadeBehaviour() { return GrenadeBehaviour; };
 
-
+	virtual void Tick(float DeltaTime) override;
 	
 
 };

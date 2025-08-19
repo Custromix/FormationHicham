@@ -23,39 +23,54 @@ void UInventoryPlayerSystemComponent::AddItem(TObjectPtr<AItem> Item)
 	switch (Item.Get()->GetItemType())
 	{
 	case EItemType::WEAPON:
-		AWeaponBase* Weapon = Cast<AWeaponBase>(Item);
-		if (WeaponInventoryComponent.Add(Weapon))
-			if (!MainItem)MainItem = Weapon;
+		{
+			AWeaponBase* Weapon = Cast<AWeaponBase>(Item);
+			if (WeaponInventoryComponent.Add(Weapon))
+				if (!MainItem)MainItem = Weapon;
 		
-		break;
-		
+			break;
+		}
+	
 	case EItemType::GRENADE:
-		AGrenade* Grenade = Cast<AGrenade>(Item);
-		if (GrenadeInventoryComponent.Add(Grenade))
-			if (!MainItem) MainItem = Grenade;
+		{
+			AGrenade* Grenade = Cast<AGrenade>(Item);
+			if (GrenadeInventoryComponent.Add(Grenade))
+				if (!MainItem) MainItem = Grenade;
 		
-		break;
-
+			break;
+		}
+	
 	case EItemType::AMMO:
-		AAmmo* Ammo = Cast<AAmmo>(Item);
-		if (AmmoInventoryComponentMap.Contains(Ammo->GetAmmoType()))
-			AmmoInventoryComponentMap[Ammo->GetAmmoType()] += Ammo->GetAmmoAmount();
-		else
-			AmmoInventoryComponentMap.Add(Ammo->GetAmmoType(), Ammo->GetAmmoAmount());
+		{
+			AAmmo* Ammo = Cast<AAmmo>(Item);
+			if (AmmoInventoryComponentMap.Contains(Ammo->GetAmmoType()))
+				AmmoInventoryComponentMap[Ammo->GetAmmoType()] += Ammo->GetAmmoAmount();
+			else
+				AmmoInventoryComponentMap.Add(Ammo->GetAmmoType(), Ammo->GetAmmoAmount());
 
-		Ammo->Destroy();
-		break;
+			Ammo->Destroy();
+			break;
+		}
+		
 	default:
+		break;
+		
 	}
 }
 
 void UInventoryPlayerSystemComponent::SwitchItem(int32 id)
 {
-	
+	IUsuableInterface* PotentialMainItem = MainItemInventory[id];
+	if (MainItem != PotentialMainItem)
+		MainItem = PotentialMainItem;
 }
 
-void UInventoryPlayerSystemComponent::RemoveItemFromInventory(TObjectPtr<AItem> Item)
+void UInventoryPlayerSystemComponent::RemoveItemFromInventory(IUsuableInterface* Item)
 {
-	WeaponInventoryComponent.Remove(Weapon);
+	if (MainItem == Item)
+	{
+		MainItem = nullptr;
+		MainItemInventory.Remove(Item);
+	}
 }
 
