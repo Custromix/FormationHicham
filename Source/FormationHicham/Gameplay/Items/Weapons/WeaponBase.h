@@ -10,7 +10,7 @@
 #include "WeaponBase.generated.h"
 
 UCLASS()
-class FORMATIONHICHAM_API AWeaponBase : public AItem
+class FORMATIONHICHAM_API AWeaponBase : public AItem, public IUsuableInterface
 {
 	GENERATED_BODY()
 
@@ -44,5 +44,8 @@ public:
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerHandleFire(FVector ViewportSize);
-	
+
+	virtual void FirstUse_Implementation(AHichamCharacter* HichamCharacter) override;
+	virtual void SecondUse_Implementation(AHichamCharacter* HichamCharacter) override;
+	virtual void ThirdUse_Implementation(AHichamCharacter* HichamCharacter) override;
 };

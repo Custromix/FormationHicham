@@ -5,7 +5,8 @@
 #include "CoreMinimal.h"
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
-#include "FormationHicham/Gameplay/Systems/InventoryComponent/InventoryComponent.h"
+#include "FormationHicham/Gameplay/Systems/Inventory/InventoryComponent.h"
+#include "FormationHicham/Gameplay/Systems/Inventory/InventoryPlayerSystemComponent.h"
 #include "GameFramework/Character.h"
 #include "HichamCharacter.generated.h"
 
@@ -26,7 +27,7 @@ private:
 	UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInventoryComponent* Inventory;
+	UInventoryPlayerSystemComponent* Inventory;
 	
 	/* Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))

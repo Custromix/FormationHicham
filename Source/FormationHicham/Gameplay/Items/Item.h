@@ -16,10 +16,11 @@ enum class EItemType : uint8
 	WEAPON      UMETA(DisplayName = "Weapon"),
 	AMMO        UMETA(DisplayName = "Ammo"),
 	CONSUMABLE  UMETA(DisplayName = "Consumable"),
+	GRENADE  UMETA(DisplayName = "Grenade"),
 };
 
 UCLASS(Abstract)
-class FORMATIONHICHAM_API AItem : public AActor, IUsuableInterface
+class FORMATIONHICHAM_API AItem : public AActor
 {
 	GENERATED_BODY()
 

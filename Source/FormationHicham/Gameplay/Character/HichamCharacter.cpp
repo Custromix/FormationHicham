@@ -5,9 +5,10 @@
 
 #include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/Engine.h"
 #include "FormationHicham/FirstPersonShooterTemplate/FormationHichamCharacter.h"
 #include "FormationHicham/Gameplay/Items/Interface/UsuableInterface.h"
-#include "FormationHicham/Gameplay/Weapons/WeaponBase.h"
 
 
 // Sets default values
@@ -23,7 +24,7 @@ AHichamCharacter::AHichamCharacter()
 	CharacterMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
 	CharacterMesh1P->SetupAttachment(Camera);
 
-	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+	Inventory = CreateDefaultSubobject<UInventoryPlayerSystemComponent>(TEXT("Inventory"));
 	
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHichamCharacter::OnOverlapBegin);
 }

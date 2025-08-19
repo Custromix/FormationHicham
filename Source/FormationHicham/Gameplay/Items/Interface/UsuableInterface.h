@@ -23,11 +23,11 @@ class FORMATIONHICHAM_API IUsuableInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void FirstUse(AHichamCharacter* HichamCharacter);
+	virtual void FirstUse(AHichamCharacter* HichamCharacter);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void SecondUse(AHichamCharacter* HichamCharacter);
+	virtual void SecondUse(AHichamCharacter* HichamCharacter);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void ThirdUse(AHichamCharacter* HichamCharacter);
+	virtual void ThirdUse(AHichamCharacter* HichamCharacter);
 };

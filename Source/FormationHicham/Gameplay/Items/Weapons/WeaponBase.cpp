@@ -29,6 +29,18 @@ void AWeaponBase::Reload()
 {
 }
 
+void AWeaponBase::FirstUse_Implementation(AHichamCharacter* HichamCharacter)
+{
+}
+
+void AWeaponBase::SecondUse_Implementation(AHichamCharacter* HichamCharacter)
+{
+}
+
+void AWeaponBase::ThirdUse_Implementation(AHichamCharacter* HichamCharacter)
+{
+}
+
 void AWeaponBase::ServerHandleFire_Implementation(FVector ViewportSize)
 {
 	FHitResult HitResult;
