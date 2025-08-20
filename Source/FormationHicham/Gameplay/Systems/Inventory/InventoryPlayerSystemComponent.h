@@ -28,6 +28,7 @@ public :
 	void AddItem(TObjectPtr<AItem> Item);
 	void SwitchItem(int32 id);
 	void RemoveItemFromInventory(IUsuableInterface* Item);
+	void DropMainItem();
 
 private:
 	

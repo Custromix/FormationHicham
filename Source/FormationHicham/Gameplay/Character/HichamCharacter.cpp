@@ -49,9 +49,13 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		
 		EnhancedPlayerInputComponent->BindAction(FirstUseAction, ETriggerEvent::Started, this, &AHichamCharacter::FirstUse);
 		
-		EnhancedPlayerInputComponent->BindAction(SecondUseAction, ETriggerEvent::Started, this, &AHichamCharacter::FirstUse);
+		EnhancedPlayerInputComponent->BindAction(SecondUseAction, ETriggerEvent::Started, this, &AHichamCharacter::SecondUse);
 		
 		EnhancedPlayerInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &AHichamCharacter::Reload);
+
+		EnhancedPlayerInputComponent->BindAction(DropAction, ETriggerEvent::Started, this, &AHichamCharacter::DropItem);
+		
+		EnhancedPlayerInputComponent->BindAction(SwitchItemAction, ETriggerEvent::Started, this, &AHichamCharacter::SwitchItem);
 	}else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
@@ -93,6 +97,17 @@ void AHichamCharacter::SecondUse()
 void AHichamCharacter::Reload()
 {
 	Inventory->GetMainItem()->ThirdUse(this);
+}
+
+void AHichamCharacter::DropItem()
+{
+	Inventory->GetMainItem()->SecondUse(this);
+	Inventory->DropMainItem();
+}
+
+void AHichamCharacter::SwitchItem(const FInputActionValue& Value)
+{
+	Inventory->GetMainItem()->SecondUse(this);
 }
 
 // Called every frame

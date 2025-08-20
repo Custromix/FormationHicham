@@ -47,6 +47,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* ReloadAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* DropAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* SwitchItemAction;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -58,6 +64,8 @@ protected:
 	void FirstUse();
 	void SecondUse();
 	void Reload();
+	void DropItem();
+	void SwitchItem(const FInputActionValue& Value);
 
 
 	UFUNCTION()
