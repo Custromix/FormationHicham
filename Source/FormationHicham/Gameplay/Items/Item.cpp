@@ -9,21 +9,24 @@ AItem::AItem()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need i
 	PrimaryActorTick.bCanEverTick = true;
 	
-	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
-	RootComponent = SceneRoot;
-	
+	//SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
 	GrabberCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Grabber Collider"));
-	GrabberCollider->SetupAttachment(RootComponent);
+	RootComponent = GrabberCollider;
+
+	//GrabberCollider->SetupAttachment(RootComponent);
 	GrabberCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	// SkeletalMesh attaché à Root aussi (indépendant de la capsule)
-	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
-	WeaponMesh->SetupAttachment(RootComponent);
+	ItemMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
+	ItemMesh->SetupAttachment(RootComponent);
+
+	Status = EStatus::NONE;
 }
 
 void AItem::OnGrab()
 {
-	GrabberCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//GrabberCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Status = EStatus::ONGRAB;
 }
 
 void AItem::OnRelease()

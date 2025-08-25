@@ -9,6 +9,7 @@
 #include "Engine/Engine.h"
 #include "FormationHicham/FirstPersonShooterTemplate/FormationHichamCharacter.h"
 #include "FormationHicham/Gameplay/Items/Interface/UsuableInterface.h"
+#include "Physics/ImmediatePhysics/ImmediatePhysicsShared/ImmediatePhysicsCore.h"
 
 
 // Sets default values
@@ -86,34 +87,40 @@ void AHichamCharacter::Look(const FInputActionValue& Value)
 
 void AHichamCharacter::FirstUse()
 {
-	Inventory->GetMainItem()->FirstUse(this);
+	if (Inventory->GetMainItem())
+		Inventory->GetMainItem()->Fire(FVector3d(0, 0, 0));
 }
 
 void AHichamCharacter::SecondUse()
 {
-	Inventory->GetMainItem()->SecondUse(this);
+	if (Inventory->GetMainItem())
+		Inventory->GetMainItem()->Aim();
 }
 
 void AHichamCharacter::Reload()
 {
-	Inventory->GetMainItem()->ThirdUse(this);
+	if (Inventory->GetMainItem())
+		Inventory->GetMainItem()->Reload();
 }
 
 void AHichamCharacter::DropItem()
 {
-	Inventory->GetMainItem()->SecondUse(this);
-	Inventory->DropMainItem();
+	if (Inventory->GetMainItem())
+	{
+		Inventory->DropMainItem(Camera->GetForwardVector());
+		FVector de = GetActorForwardVector();
+	}
 }
 
 void AHichamCharacter::SwitchItem(const FInputActionValue& Value)
 {
-	Inventory->GetMainItem()->SecondUse(this);
+	//Inventory->GetMainItem()->SecondUse(this);
 }
 
 // Called every frame
 void AHichamCharacter::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	//Super::Tick(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -123,11 +130,16 @@ void AHichamCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 										 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 										 bool bFromSweep, const FHitResult& SweepResult)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Silver, "Colide");
+
 	if (AItem* Item = Cast<AItem>(OtherActor))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, OtherActor->GetName());
-		Inventory->AddItem(Item);
-		Item->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, "S_Riffle");
-		Item->OnGrab();
+		if (Item->GetStatus() == EStatus::NONE)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, "Item->GetStatus()");
+			Inventory->AddItem(Item);
+			Item->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, "S_Riffle");
+			Item->OnGrab();
+		}
 	}
 }

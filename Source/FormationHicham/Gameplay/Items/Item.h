@@ -17,6 +17,13 @@ enum class EItemType : uint8
 	GRENADE  UMETA(DisplayName = "Grenade"),
 };
 
+UENUM(BlueprintType, Blueprintable)
+enum class EStatus : uint8
+{
+	NONE,
+	ONGRAB,
+};
+
 UCLASS(Abstract)
 class FORMATIONHICHAM_API AItem : public AActor
 {
@@ -35,9 +42,11 @@ protected:
 	UCapsuleComponent* GrabberCollider;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USkeletalMeshComponent* WeaponMesh;
+	USkeletalMeshComponent* ItemMesh;
 	
 	EItemType ItemType;
+	
+	EStatus Status;
 	
 public:
 	
@@ -45,4 +54,5 @@ public:
 	virtual void OnRelease();
 
 	EItemType GetItemType() const { return ItemType; }
+	EStatus GetStatus() const { return Status; }
 };

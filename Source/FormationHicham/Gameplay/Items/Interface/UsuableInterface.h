@@ -30,4 +30,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
 	void ThirdUse(class AHichamCharacter* HichamCharacter);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
+	void Drop();
 };

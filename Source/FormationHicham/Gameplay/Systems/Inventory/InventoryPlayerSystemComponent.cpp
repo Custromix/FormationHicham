@@ -20,23 +20,14 @@ void UInventoryPlayerSystemComponent::BeginPlay()
 
 void UInventoryPlayerSystemComponent::AddItem(TObjectPtr<AItem> Item)
 {
+
 	switch (Item.Get()->GetItemType())
 	{
 	case EItemType::WEAPON:
 		{
 			AWeaponBase* Weapon = Cast<AWeaponBase>(Item);
-			if (WeaponInventoryComponent.Add(Weapon))
-				if (!MainItem)MainItem = Weapon;
-		
-			break;
-		}
-	
-	case EItemType::GRENADE:
-		{
-			AGrenade* Grenade = Cast<AGrenade>(Item);
-			if (GrenadeInventoryComponent.Add(Grenade))
-				if (!MainItem) MainItem = Grenade;
-		
+			if (!MainItem) MainItem = Weapon;
+			
 			break;
 		}
 	
@@ -54,23 +45,12 @@ void UInventoryPlayerSystemComponent::AddItem(TObjectPtr<AItem> Item)
 		
 	default:
 		break;
-		
 	}
 }
 
-void UInventoryPlayerSystemComponent::SwitchItem(int32 id)
+void UInventoryPlayerSystemComponent::DropMainItem(FVector CameraForwardVector)
 {
-	IUsuableInterface* PotentialMainItem = MainItemInventory[id];
-	if (MainItem != PotentialMainItem)
-		MainItem = PotentialMainItem;
-}
-
-void UInventoryPlayerSystemComponent::RemoveItemFromInventory(IUsuableInterface* Item)
-{
-	if (MainItem == Item)
-	{
-		MainItem = nullptr;
-		MainItemInventory.Remove(Item);
-	}
+	MainItem->Drop(CameraForwardVector);
+	WeaponInventoryComponent.Remove(MainItem);
 }
 

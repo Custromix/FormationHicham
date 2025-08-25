@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "FormationHicham/Gameplay/Items/Grenade/Grenade.h"
 #include "FormationHicham/Gameplay/Items/Weapons/WeaponBase.h"
 #include "InventoryPlayerSystemComponent.generated.h"
 
@@ -23,21 +22,18 @@ protected:
 	virtual void BeginPlay() override;
 
 public :
-	IUsuableInterface* GetMainItem() { return MainItem; }
+	TObjectPtr<AWeaponBase> GetMainItem() { return MainItem; }
 	
 	void AddItem(TObjectPtr<AItem> Item);
 	void SwitchItem(int32 id);
 	void RemoveItemFromInventory(IUsuableInterface* Item);
-	void DropMainItem();
+	void DropMainItem(FVector CameraForwardVector);
 
 private:
 	
-	TArray<IUsuableInterface*> MainItemInventory;
-	
 	TArray<TObjectPtr<AWeaponBase>> WeaponInventoryComponent;
-	TArray<TObjectPtr<AGrenade>> GrenadeInventoryComponent;
 	TMap<EAmmoType, int32> AmmoInventoryComponentMap;
 
 
-	IUsuableInterface* MainItem;
+	TObjectPtr<AWeaponBase> MainItem;
 };

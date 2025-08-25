@@ -10,7 +10,7 @@
 #include "WeaponBase.generated.h"
 
 UCLASS()
-class FORMATIONHICHAM_API AWeaponBase : public AItem, public IUsuableInterface
+class FORMATIONHICHAM_API AWeaponBase : public AItem
 {
 	GENERATED_BODY()
 
@@ -29,6 +29,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UWeaponDataAsset> WeaponInfoDataAsset;
 
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+						bool bFromSweep, const FHitResult& SweepResult);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -36,16 +41,28 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void Fire(FVector ViewportSize);
+	UFUNCTION(Category="Weapon")
+	virtual void Fire(FVector3d ViewportSize);
+	
+	UFUNCTION(Category="Weapon")
+	virtual void Aim();
 
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void Reload();
+	UFUNCTION(Category="Weapon")
+	virtual void Reload();
+
+	UFUNCTION(Category="Weapon")
+	virtual void Drop(FVector PlayerForwardVector);
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerHandleFire(FVector ViewportSize);
 
-	virtual void FirstUse_Implementation(AHichamCharacter* HichamCharacter) override;
-	virtual void SecondUse_Implementation(AHichamCharacter* HichamCharacter) override;
-	virtual void ThirdUse_Implementation(AHichamCharacter* HichamCharacter) override;
+	UFUNCTION(Server, Unreliable)
+	void ServerHandleAim();
+
+	UFUNCTION(Server, Unreliable)
+	void ServerHandleReload();
+	
+	UFUNCTION(Server, Unreliable)
+	void ServerHandleDrop();
+
 };
