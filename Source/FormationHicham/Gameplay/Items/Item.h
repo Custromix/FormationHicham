@@ -35,11 +35,11 @@ public:
 
 protected:
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	USceneComponent* SceneRoot;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	//USceneComponent* SceneRoot;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UCapsuleComponent* GrabberCollider;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//UCapsuleComponent* GrabberCollider;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USkeletalMeshComponent* ItemMesh;

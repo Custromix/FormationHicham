@@ -8,6 +8,10 @@ public class FormationHicham : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG" });
+		
+		PrivateDependencyModuleNames.AddRange(new string[] {
+			"Slate", "SlateCore"   // utiles pour UMG, gardés en Private tant que tu n'exposes pas de types Slate en .h
+		});
 	}
 }

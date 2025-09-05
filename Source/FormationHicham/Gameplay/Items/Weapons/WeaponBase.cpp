@@ -3,13 +3,17 @@
 
 #include "WeaponBase.h"
 
-#include "Physics/ImmediatePhysics/ImmediatePhysicsShared/ImmediatePhysicsCore.h"
+#include "Engine/DamageEvents.h"
 
 AWeaponBase::AWeaponBase()
 {
 	ItemType = EItemType::WEAPON;
-	GrabberCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnOverlapBegin);
+	//GrabberCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnOverlapBegin);
+	//GrabberCollider->OnComponentEndOverlap.AddDynamic(this, &AWeaponBase::OnOverlapEnd);
+	//GrabberCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnOverlapBegin);
+	//ItemMesh->OnComponentHit.AddDynamic(this, &AWeaponBase::OnHit);
 }
+
 
 void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -18,7 +22,6 @@ void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	/*if (OtherComp->ComponentHasTag("Ground"))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Ground");
-
 	}
 	if (OverlappedComp->ComponentHasTag("Ground"))
 	{
@@ -33,6 +36,15 @@ void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	}*/
 }
 
+void AWeaponBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+				  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+}
+
+void AWeaponBase::OnHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor)
+{
+}
+
 // Called when the game starts or when spawned
 void AWeaponBase::BeginPlay()
 {
@@ -45,9 +57,36 @@ void AWeaponBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AWeaponBase::Fire(FVector3d ViewportSize)
+void AWeaponBase::Fire(FVector Start, FVector End)
 {
-	ServerHandleFire(ViewportSize);
+	FHitResult HitResult;
+	
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+	
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+	HitResult,
+	Start,
+	Start + End * 5000.0f,
+	ECC_Visibility
+	);
+	
+	if (bHit)
+	{
+		DrawDebugLine(GetWorld(), Start, HitResult.Location, FColor::Red, false, 2.0f);
+		
+		if (WeaponInfoDataAsset->DamageType == EDamageType::POINT)
+		{
+			FPointDamageEvent DamageType;
+			HitResult.GetActor()->TakeDamage(WeaponInfoDataAsset->Damage, DamageType, GetInstigatorController(), GetOwner());
+		}else
+		{
+			FRadialDamageEvent DamageType;
+			HitResult.GetActor()->TakeDamage(WeaponInfoDataAsset->Damage, DamageType, GetInstigatorController(), GetOwner());
+		}
+	}
+	else DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 2.0f);
 }
 
 void AWeaponBase::Aim()

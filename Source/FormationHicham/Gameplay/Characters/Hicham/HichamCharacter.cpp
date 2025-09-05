@@ -7,10 +7,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
-#include "FormationHicham/FirstPersonShooterTemplate/FormationHichamCharacter.h"
-#include "FormationHicham/Gameplay/Items/Interface/UsuableInterface.h"
-#include "Physics/ImmediatePhysics/ImmediatePhysicsShared/ImmediatePhysicsCore.h"
-
 
 // Sets default values
 AHichamCharacter::AHichamCharacter()
@@ -26,6 +22,8 @@ AHichamCharacter::AHichamCharacter()
 	CharacterMesh1P->SetupAttachment(Camera);
 
 	Inventory = CreateDefaultSubobject<UInventoryPlayerSystemComponent>(TEXT("Inventory"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
+
 	
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHichamCharacter::OnOverlapBegin);
 }
@@ -59,7 +57,7 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedPlayerInputComponent->BindAction(SwitchItemAction, ETriggerEvent::Started, this, &AHichamCharacter::SwitchItem);
 	}else
 	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		//UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
 
@@ -88,7 +86,7 @@ void AHichamCharacter::Look(const FInputActionValue& Value)
 void AHichamCharacter::FirstUse()
 {
 	if (Inventory->GetMainItem())
-		Inventory->GetMainItem()->Fire(FVector3d(0, 0, 0));
+		Inventory->GetMainItem()->Fire(Camera->GetComponentLocation(), Camera->GetForwardVector());
 }
 
 void AHichamCharacter::SecondUse()
@@ -130,7 +128,7 @@ void AHichamCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 										 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 										 bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Silver, "Colide");
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Silver, "Colide");
 
 	if (AItem* Item = Cast<AItem>(OtherActor))
 	{

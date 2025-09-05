@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
+#include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
 #include "FormationHicham/Gameplay/Systems/Inventory/InventoryPlayerSystemComponent.h"
 #include "GameFramework/Character.h"
 #include "HichamCharacter.generated.h"
@@ -18,6 +19,29 @@ public:
 	// Sets default values for this character's properties
 	AHichamCharacter();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	void FirstUse();
+	void SecondUse();
+	void Reload();
+	void DropItem();
+	void SwitchItem(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+						bool bFromSweep, const FHitResult& SweepResult);
+
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* CharacterMesh1P;
@@ -25,8 +49,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Inventory, meta=(AllowPrivateAccess = "true"))
 	UInventoryPlayerSystemComponent* Inventory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health, meta=(AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
+
 	
 	/* Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -52,29 +80,5 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SwitchItemAction;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	void FirstUse();
-	void SecondUse();
-	void Reload();
-	void DropItem();
-	void SwitchItem(const FInputActionValue& Value);
-
-
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-						bool bFromSweep, const FHitResult& SweepResult);
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

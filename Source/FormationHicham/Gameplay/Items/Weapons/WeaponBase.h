@@ -26,13 +26,19 @@ public:
 	UAnimMontage* FireAnimation;
 
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UWeaponDataAsset> WeaponInfoDataAsset;
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 						bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+				  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor);
 
 protected:
 	virtual void BeginPlay() override;
@@ -42,7 +48,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION(Category="Weapon")
-	virtual void Fire(FVector3d ViewportSize);
+	virtual void Fire(FVector Start, FVector End);
 	
 	UFUNCTION(Category="Weapon")
 	virtual void Aim();

@@ -10,15 +10,16 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	//SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
-	GrabberCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Grabber Collider"));
-	RootComponent = GrabberCollider;
+	//GrabberCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Grabber Collider"));
+	//RootComponent = GrabberCollider;
 
 	//GrabberCollider->SetupAttachment(RootComponent);
-	GrabberCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	//GrabberCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	// SkeletalMesh attaché à Root aussi (indépendant de la capsule)
 	ItemMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
-	ItemMesh->SetupAttachment(RootComponent);
+	RootComponent = ItemMesh;
+	//ItemMesh->SetupAttachment(RootComponent);
 
 	Status = EStatus::NONE;
 }
@@ -31,7 +32,7 @@ void AItem::OnGrab()
 
 void AItem::OnRelease()
 {
-	GrabberCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	//GrabberCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 
