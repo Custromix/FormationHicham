@@ -1,15 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
+// TrumpGuard.cpp
 #include "TrumpGuard.h"
+#include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
+#include "TrumpGuardAIController.h"              // notre contrôleur IA
+#include "BehaviorTree/BehaviorTree.h"
 
-
-// Sets default values
 ATrumpGuard::ATrumpGuard()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 	HealthComponent->OnDeath.AddDynamic(this, &ATrumpGuard::OnDeath);
 
@@ -24,6 +22,15 @@ ATrumpGuard::ATrumpGuard()
 void ATrumpGuard::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Si tu préfères lancer le BT depuis le Pawn (sinon on le fait côté Controller)
+	if (BehaviorTreeAsset)
+	{
+		if (AAIController* AIC = Cast<AAIController>(GetController()))
+		{
+			AIC->RunBehaviorTree(BehaviorTreeAsset);
+		}
+	}
 }
 
 void ATrumpGuard::OnDeath()
@@ -31,10 +38,12 @@ void ATrumpGuard::OnDeath()
 	Destroy();
 }
 
-// Called every frame
 void ATrumpGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-
+void ATrumpGuard::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}

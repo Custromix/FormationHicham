@@ -1,10 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// TrumpGuardAIController.h
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Runtime/AIModule/Classes/AIController.h"
+#include "AIController.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "TrumpGuardAIController.generated.h"
+
+class UAIPerceptionComponent;
+class UAISenseConfig_Sight;
+class UBehaviorTree;
 
 UCLASS()
 class FORMATIONHICHAM_API ATrumpGuardAIController : public AAIController
@@ -12,17 +16,7 @@ class FORMATIONHICHAM_API ATrumpGuardAIController : public AAIController
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ATrumpGuardAIController();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;

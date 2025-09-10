@@ -1,39 +1,65 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
+// TrumpGuardAIController.cpp
 #include "TrumpGuardAIController.h"
+#include "AIPerceptionComponent.h"
+#include "AISenseConfig_Sight.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/Character.h"
 
-
-// Sets default values
 ATrumpGuardAIController::ATrumpGuardAIController()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	Perception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception"));
-	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+    Perception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception"));
+    SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
-	SightConfig->SightRadius = 2000.f;
-	SightConfig->LoseSightRadius = 2500.f;
-	SightConfig->PeripheralVisionAngleDegrees = 70.f;
-	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+    SightConfig->SightRadius = 2000.f;
+    SightConfig->LoseSightRadius = 2500.f;
+    SightConfig->PeripheralVisionAngleDegrees = 70.f;
+    SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+    SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+    SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 
-	Perception->ConfigureSense(*SightConfig);
-	Perception->SetDominantSense(SightConfig->GetSenseImplementation());
-	Perception->OnTargetPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::HandleTargetPerceptionUpdated);
+    Perception->ConfigureSense(*SightConfig);
+    Perception->SetDominantSense(SightConfig->GetSenseImplementation());
+    Perception->OnTargetPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::HandleTargetPerceptionUpdated);
 }
 
-// Called when the game starts or when spawned
-void ATrumpGuardAIController::BeginPlay()
+void ATrumpGuardAIController::OnPossess(APawn* InPawn)
 {
-	Super::BeginPlay();
-	
+    Super::OnPossess(InPawn);
+
+    // Lance un BehaviorTree si on en a un (depuis le Pawn ou ce contrôleur)
+    if (ACharacter* C = Cast<ACharacter>(InPawn))
+    {
+        // Cherche un BT sur le Pawn (notre champ BehaviorTreeAsset dans ATrumpGuard)
+        if (UProperty* Prop = C->GetClass()->FindPropertyByName(TEXT("BehaviorTreeAsset")))
+        {
+            UBehaviorTree** BTAddr = Prop->ContainerPtrToValuePtr<UBehaviorTree*>(C);
+            if (BTAddr && *BTAddr)
+            {
+                RunBehaviorTree(*BTAddr);
+                return;
+            }
+        }
+    }
+
+    if (DefaultBehaviorTree)
+    {
+        RunBehaviorTree(DefaultBehaviorTree);
+    }
 }
 
-// Called every frame
-void ATrumpGuardAIController::Tick(float DeltaTime)
+void ATrumpGuardAIController::HandleTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	Super::Tick(DeltaTime);
+    if (UBlackboardComponent* BB = GetBlackboardComponent())
+    {
+        const FName TargetKey = TEXT("TargetActor");
+        if (Stimulus.WasSuccessfullySensed())
+        {
+            BB->SetValueAsObject(TargetKey, Actor);
+        }
+        else if (BB->GetValueAsObject(TargetKey) == Actor)
+        {
+            BB->ClearValue(TargetKey);
+        }
+    }
 }
-
