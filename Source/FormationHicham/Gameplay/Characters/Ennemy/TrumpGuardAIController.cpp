@@ -1,65 +1,68 @@
 // TrumpGuardAIController.cpp
 #include "TrumpGuardAIController.h"
-#include "AIPerceptionComponent.h"
-#include "AISenseConfig_Sight.h"
-#include "BehaviorTree/BehaviorTree.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
 
 ATrumpGuardAIController::ATrumpGuardAIController()
 {
-    Perception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception"));
-    SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 
-    SightConfig->SightRadius = 2000.f;
-    SightConfig->LoseSightRadius = 2500.f;
-    SightConfig->PeripheralVisionAngleDegrees = 70.f;
-    SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-    SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-    SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-
-    Perception->ConfigureSense(*SightConfig);
-    Perception->SetDominantSense(SightConfig->GetSenseImplementation());
-    Perception->OnTargetPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::HandleTargetPerceptionUpdated);
+	// Dans BasicAIController.cpp constructeur :
+	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	SightConfig->SightRadius = 1200.f;
+	SightConfig->PeripheralVisionAngleDegrees = 90.f;
+ 
+	PerceptionComponent->ConfigureSense(*SightConfig);
+	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
+	
+	GenericTeamID = (uint8)TeamID;
 }
 
-void ATrumpGuardAIController::OnPossess(APawn* InPawn)
+void ATrumpGuardAIController::BeginPlay()
 {
-    Super::OnPossess(InPawn);
-
-    // Lance un BehaviorTree si on en a un (depuis le Pawn ou ce contrôleur)
-    if (ACharacter* C = Cast<ACharacter>(InPawn))
-    {
-        // Cherche un BT sur le Pawn (notre champ BehaviorTreeAsset dans ATrumpGuard)
-        if (UProperty* Prop = C->GetClass()->FindPropertyByName(TEXT("BehaviorTreeAsset")))
-        {
-            UBehaviorTree** BTAddr = Prop->ContainerPtrToValuePtr<UBehaviorTree*>(C);
-            if (BTAddr && *BTAddr)
-            {
-                RunBehaviorTree(*BTAddr);
-                return;
-            }
-        }
-    }
-
-    if (DefaultBehaviorTree)
-    {
-        RunBehaviorTree(DefaultBehaviorTree);
-    }
+	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::OnPerceptionUpdated);
 }
 
-void ATrumpGuardAIController::HandleTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+void ATrumpGuardAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
-    if (UBlackboardComponent* BB = GetBlackboardComponent())
-    {
-        const FName TargetKey = TEXT("TargetActor");
-        if (Stimulus.WasSuccessfullySensed())
-        {
-            BB->SetValueAsObject(TargetKey, Actor);
-        }
-        else if (BB->GetValueAsObject(TargetKey) == Actor)
-        {
-            BB->ClearValue(TargetKey);
-        }
-    }
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "L'IA voit le joueur");
 }
+
+ETeamAttitude::Type ATrumpGuardAIController::GetTeamAttitudeTowards(const AActor& Other) const
+{
+	
+	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Orange, "In GetTeamAttitudeTowards");
+	const IGenericTeamAgentInterface* OtherTeamAgent = Cast<const IGenericTeamAgentInterface>(&Other);
+	if (OtherTeamAgent)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Blue, "OtherTeamAgent = true");
+		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Cyan, FString::Printf(TEXT("Team ID : %d"), OtherTeamAgent->GetGenericTeamId()));
+		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Cyan, FString::Printf(TEXT("Team ID : %d"), (int32) ETeamType::Neutral));
+		if (OtherTeamAgent->GetGenericTeamId() == (uint8) ETeamType::Neutral)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Blue, "GetGenericTeamId = Neutral");
+			return ETeamAttitude::Neutral;
+		}
+		
+		if (OtherTeamAgent->GetGenericTeamId() != GetGenericTeamId())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, "GetGenericTeamId = Hostile");
+			return ETeamAttitude::Hostile;
+		}else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Green, "GetGenericTeamId = Friendly");
+			return ETeamAttitude::Friendly;
+		}
+		//return GetGenericTeamId() != OtherTeamAgent->GetGenericTeamId() ? ETeamAttitude::Hostile : ETeamAttitude::Friendly;
+	}
+	return ETeamAttitude::Neutral;
+
+	/*
+	const IGenericTeamAgentInterface* OtherTeamAgent = Cast<const IGenericTeamAgentInterface>(&Other);
+	return OtherTeamAgent ? FGenericTeamId::GetAttitude(GetGenericTeamId(), OtherTeamAgent->GetGenericTeamId())
+		: ETeamAttitude::Neutral;
+	 */
+}
+
+

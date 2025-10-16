@@ -32,7 +32,7 @@ AHichamCharacter::AHichamCharacter()
 void AHichamCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GenericTeamID = (uint8)TeamID;
 }
 
 void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

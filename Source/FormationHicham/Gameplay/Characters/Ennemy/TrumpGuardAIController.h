@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "Perception/AIPerceptionTypes.h"
+#include "FormationHicham/Gameplay/Characters/Enum/ETeam.h"
 #include "TrumpGuardAIController.generated.h"
 
 class UAIPerceptionComponent;
@@ -19,18 +19,25 @@ public:
 	ATrumpGuardAIController();
 
 protected:
-	virtual void OnPossess(APawn* InPawn) override;
-
-	UPROPERTY(VisibleAnywhere, Category="AI")
-	UAIPerceptionComponent* Perception = nullptr;
-
-	UPROPERTY()
-	UAISenseConfig_Sight* SightConfig = nullptr;
-
-	// Option 2 : assigner le BT ici si tu préfères (sinon via le Pawn)
-	UPROPERTY(EditDefaultsOnly, Category="AI")
-	UBehaviorTree* DefaultBehaviorTree = nullptr;
-
+	virtual void BeginPlay() override;
+	
 	UFUNCTION()
-	void HandleTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+
+public:
+	virtual FGenericTeamId GetGenericTeamId() const override { return GenericTeamID; }
+	
+	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+	
+protected:
+	UPROPERTY()
+	UAISenseConfig_Sight* SightConfig;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ETeamType TeamID = ETeamType::Enemy;
+
+private:
+	UPROPERTY()
+	FGenericTeamId GenericTeamID;
+
 };

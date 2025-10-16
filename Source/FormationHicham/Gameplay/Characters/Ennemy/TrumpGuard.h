@@ -2,11 +2,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "TrumpGuard.generated.h"
-
-class UHealthComponent;      // fwd declare
-class UBehaviorTree;         // fwd declare
 
 UCLASS()
 class FORMATIONHICHAM_API ATrumpGuard : public ACharacter
@@ -24,13 +22,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health", meta=(AllowPrivateAccess="true"))
 	UHealthComponent* HealthComponent;
-
-	// Assignable dans l’éditeur (ou par défaut en C++)
-	UPROPERTY(EditDefaultsOnly, Category="AI")
-	UBehaviorTree* BehaviorTreeAsset;
 };
