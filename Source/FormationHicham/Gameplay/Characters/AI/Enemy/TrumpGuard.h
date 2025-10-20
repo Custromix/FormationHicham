@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "TrumpGuard.generated.h"
@@ -22,6 +23,13 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
+
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	UBehaviorTree* BehaviorTree;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health", meta=(AllowPrivateAccess="true"))

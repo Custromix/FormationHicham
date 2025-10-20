@@ -85,7 +85,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* SwitchItemAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
 	ETeamType TeamID = ETeamType::Player;
 
 private:
