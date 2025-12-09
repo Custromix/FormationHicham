@@ -14,7 +14,6 @@ UBTTask_FindRandomLocation::UBTTask_FindRandomLocation()
 
 EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "ExecutedTASK");
 
 	if (const ATrumpGuardAIController* OwnerAIController = Cast<ATrumpGuardAIController>(OwnerComp.GetAIOwner()))
 	{
@@ -26,10 +25,7 @@ EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeCompone
 			{
 				FNavLocation NewNpcLocation;
 				if (NavSystem->GetRandomPointInNavigableRadius(NpcLocationOrigin, SearchRadius, NewNpcLocation))
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "On met les valeur de loc");
 					OwnerComp.GetBlackboardComponent()->SetValueAsVector("PatrolLocation", NewNpcLocation.Location);
-				}
 
 				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 				return EBTNodeResult::Succeeded;

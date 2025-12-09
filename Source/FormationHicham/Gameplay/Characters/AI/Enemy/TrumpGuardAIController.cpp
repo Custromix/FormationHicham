@@ -22,38 +22,100 @@ ATrumpGuardAIController::ATrumpGuardAIController()
 	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 }
 
-
-
 void ATrumpGuardAIController::BeginPlay()
 {
 	Super::BeginPlay();
 	//PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::OnPerceptionUpdated);
-	if (const ATrumpGuard* TrumpGuard = Cast<ATrumpGuard>(GetPawn()))
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::OnTargetPerceptionUpdated);
+}
+
+void ATrumpGuardAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	if (!Blackboard || !Actor) return;
+
+	
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Le joueur est vu");
+
+		Blackboard->SetValueAsObject("TargetActor", Actor);
+		Blackboard->SetValueAsBool("HasLineOfSight", true);
+		return;
+	}else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Le joueur a disparu");
+
+	}
+	
+	FActorPerceptionBlueprintInfo Info;
+	PerceptionComponent->GetActorsPerception(Actor, Info);
+
+	bool bStillSeenBySight = false;
+	int32 i = 0;
+	while (!bStillSeenBySight && Info.LastSensedStimuli.Num() > i)
+	{
+		if (Info.LastSensedStimuli[i].Type == UAISense::GetSenseID(UAISense_Sight::StaticClass())
+			&& Info.LastSensedStimuli[i].WasSuccessfullySensed())
+			bStillSeenBySight = true;
+		
+		i++;
+	}
+	for (const auto& S : Info.LastSensedStimuli)
+	{
+		if (S.Type == UAISense::GetSenseID(UAISense_Sight::StaticClass())
+			&& S.WasSuccessfullySensed())
+		{
+			bStillSeenBySight = true;
+			break;
+		}
+	}
+
+	if (!bStillSeenBySight)
+	{
+		Blackboard->ClearValue("TargetActor");
+		Blackboard->SetValueAsBool("HasLineOfSight", false);
+	}
+}
+
+void ATrumpGuardAIController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+// 	/*if (!GetPawn()) return;
+//
+// 	FVector Start = GetPawn()->GetActorLocation();
+// 	FVector Direction = GetPawn()->GetActorForwardVector();
+// 	float Radius = SightConfig->SightRadius;
+// 	float Angle = FMath::DegreesToRadians(SightConfig->PeripheralVisionAngleDegrees);
+//
+// 	DrawDebugCone(
+// 		GetWorld(),
+// 		Start,
+// 		Direction,
+// 		Radius,
+// 		Angle / 2,
+// 		Angle / 2,
+// 		32,
+// 		FColor::Green,
+// 		false,
+// 		-1.0f,
+// 		0,
+// 		1.0f
+// 	);*/
+}
+
+void ATrumpGuardAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	if (const ATrumpGuard* TrumpGuard = Cast<ATrumpGuard>(InPawn))
 	{
 		if (TrumpGuard->GetBehaviorTree())
 		{
 			BehaviorTree = TrumpGuard->GetBehaviorTree();
 			RunBehaviorTree(BehaviorTree);
-			if (Blackboard)
-				Blackboard->SetValueAsObject("TargetActor", GetWorld()->GetFirstPlayerController()->GetCharacter());
-			
 		}
 	}
 }
-
-void ATrumpGuardAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, "L'ia a vu le joueur");
-
-	for (AActor* const VisibleActor : UpdatedActors)
-	{
-		if (Blackboard)
-			Blackboard->SetValueAsObject("TargetActor", VisibleActor);
-	}
-	
-}
-
-
 
 ETeamAttitude::Type ATrumpGuardAIController::GetTeamAttitudeTowards(const AActor& Other) const
 {
@@ -63,12 +125,6 @@ ETeamAttitude::Type ATrumpGuardAIController::GetTeamAttitudeTowards(const AActor
 		return OtherTeamAgent->GetGenericTeamId() != GetGenericTeamId() ? ETeamAttitude::Hostile : ETeamAttitude::Friendly;
 	}
 	return ETeamAttitude::Neutral;
-
-	/*
-	const IGenericTeamAgentInterface* OtherTeamAgent = Cast<const IGenericTeamAgentInterface>(&Other);
-	return OtherTeamAgent ? FGenericTeamId::GetAttitude(GetGenericTeamId(), OtherTeamAgent->GetGenericTeamId())
-		: ETeamAttitude::Neutral;
-	 */
 }
 
 

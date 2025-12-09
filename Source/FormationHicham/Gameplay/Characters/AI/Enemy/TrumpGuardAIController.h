@@ -24,12 +24,16 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+
+	virtual void OnPossess(APawn* InPawn) override;
 
 public:
 	virtual FGenericTeamId GetGenericTeamId() const override { return GenericTeamID; }
 	
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI|Initialize")
@@ -38,7 +42,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI|Initialize")
 	ETeamType TeamID = ETeamType::Enemy;
 
-	
 private:
 	UPROPERTY()
 	FGenericTeamId GenericTeamID;
@@ -49,3 +52,4 @@ private:
 	UPROPERTY()
 	UBehaviorTree* BehaviorTree;
 };
+

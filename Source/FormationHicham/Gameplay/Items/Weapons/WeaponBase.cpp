@@ -18,7 +18,6 @@ AWeaponBase::AWeaponBase()
 void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "caca");
 	/*if (OtherComp->ComponentHasTag("Ground"))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Ground");
@@ -95,6 +94,12 @@ void AWeaponBase::Aim()
 
 void AWeaponBase::Reload()
 {
+}
+
+void AWeaponBase::OnGrab()
+{
+	Super::OnGrab();
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AWeaponBase::Drop(FVector CameraForwardVector)

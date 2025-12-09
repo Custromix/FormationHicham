@@ -57,6 +57,9 @@ public:
 	virtual void Reload();
 
 	UFUNCTION(Category="Weapon")
+	virtual void OnGrab() override;
+	
+	UFUNCTION(Category="Weapon")
 	virtual void Drop(FVector PlayerForwardVector);
 	
 	UFUNCTION(Server, Unreliable)
