@@ -1,7 +1,7 @@
 // TrumpGuardAIController.cpp
 #include "TrumpGuardAIController.h"
 
-#include "TrumpGuard.h"
+#include "TrumpGuardBase.h"
 #include "FormationHicham/Gameplay/Characters/Enum/EAIStates.h"
 #include "FormationHicham/Gameplay/Characters/Hicham/HichamCharacter.h"
 #include "GameFramework/GameSession.h"
@@ -107,7 +107,7 @@ void ATrumpGuardAIController::Tick(float DeltaSeconds)
 void ATrumpGuardAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	if (const ATrumpGuard* TrumpGuard = Cast<ATrumpGuard>(InPawn))
+	if (const ATrumpGuardBase* TrumpGuard = Cast<ATrumpGuardBase>(InPawn))
 	{
 		if (TrumpGuard->GetBehaviorTree())
 		{

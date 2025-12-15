@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "FormationHicham/Gameplay/Characters/Enum/EAIStates.h"
 #include "FormationHicham/Gameplay/Characters/Enum/ETeam.h"
+#include "FormationHicham/Gameplay/Items/Interface/EnemyInterface.h"
 #include "TrumpGuardAIController.generated.h"
 
 class UAISenseConfig_Sight;
