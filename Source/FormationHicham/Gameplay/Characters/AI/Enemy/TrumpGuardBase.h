@@ -18,12 +18,6 @@ class FORMATIONHICHAM_API ATrumpGuardBase : public ACharacter
 public:
 	ATrumpGuardBase();
 
-protected:
-	virtual void BeginPlay() override;
-	
-	UFUNCTION()
-	void OnDeath();
-
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -31,24 +25,39 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attack AI")
 	virtual void Attack() {};
-
-	UFUNCTION(BlueprintCallable, Category = "Attack AI")
-	void CallOnAttackFinished() { OnAttackFinished.Broadcast(); }
-
-	UPROPERTY(BlueprintAssignable, Category = "Attack AI")
-	FOnAttackFinished OnAttackFinished;
 	
-	void StartAttackAnim() const;
-
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartMontage();
+
+	void StartMontage_Implementation()
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "AttacBIEN");
+
+		GetMesh()->GetAnimInstance()->Montage_Play(AttackAnimMontage);
+	}
+	
+	void StopMontage() const { /*GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, AttackAnimMontage);*/ };
+
+
+protected:
+	virtual void BeginPlay() override;
+	
+	UFUNCTION()
+	void OnDeath() { Destroy(); }
+
+public:
+	UPROPERTY(BlueprintCallable, Category = "Attack AI")
+	FOnAttackFinished OnAttackFinished;
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	UBehaviorTree* BehaviorTree;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	UAnimationAsset* AttackAnimMontage;
+	UAnimMontage* AttackAnimMontage;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health", meta=(AllowPrivateAccess="true"))

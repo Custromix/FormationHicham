@@ -29,6 +29,7 @@ void AMeleeTrumpGuard::Attack()
 	QueryParams.AddIgnoredActor(this);
 
 	
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "Attaque linetrace");
 	bool bHit = GetWorld()->SweepSingleByChannel(
 	SphereTraceResult,
 	Start,
