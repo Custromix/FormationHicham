@@ -21,6 +21,9 @@ public:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	void WhenPlayerSeen();
+	void WhenPlayerUnseen();
+
 	UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
 
 	UFUNCTION(BlueprintCallable, Category = "Attack AI")
@@ -29,17 +32,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void StartMontage();
-
-	void StartMontage_Implementation()
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "AttacBIEN");
-
-		GetMesh()->GetAnimInstance()->Montage_Play(AttackAnimMontage);
-	}
-	
-	void StopMontage() const { /*GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, AttackAnimMontage);*/ };
+	void StartMontage() const { GetMesh()->GetAnimInstance()->Montage_Play(AttackAnimMontage); }
+	void StopMontage() const { GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, AttackAnimMontage); }
 
 
 protected:
@@ -58,6 +52,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* AttackAnimMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float WalkSpeed = 300.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float RunSpeed = 500.f;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health", meta=(AllowPrivateAccess="true"))

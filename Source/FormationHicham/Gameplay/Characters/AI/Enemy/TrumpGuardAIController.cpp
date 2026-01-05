@@ -7,6 +7,11 @@
 #include "GameFramework/GameSession.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "FormationHicham/Gameplay/Items/Interface/EnemyInterface.h"
+#include "GameFramework/Character.h"
 
 ATrumpGuardAIController::ATrumpGuardAIController()
 {
@@ -25,7 +30,6 @@ ATrumpGuardAIController::ATrumpGuardAIController()
 void ATrumpGuardAIController::BeginPlay()
 {
 	Super::BeginPlay();
-	//PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::OnPerceptionUpdated);
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ATrumpGuardAIController::OnTargetPerceptionUpdated);
 }
 
@@ -39,12 +43,13 @@ void ATrumpGuardAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimul
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Le joueur est vu");
 
 		Blackboard->SetValueAsObject("TargetActor", Actor);
-		Blackboard->SetValueAsBool("HasLineOfSight", true);
+		bIsPlayerSeen = true;
+		TrumpGuardCharacter->WhenPlayerSeen();
+		Blackboard->SetValueAsBool("HasLineOfSight", bIsPlayerSeen);
 		return;
 	}else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Le joueur a disparu");
-
 	}
 	
 	FActorPerceptionBlueprintInfo Info;
@@ -73,7 +78,9 @@ void ATrumpGuardAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimul
 	if (!bStillSeenBySight)
 	{
 		Blackboard->ClearValue("TargetActor");
-		Blackboard->SetValueAsBool("HasLineOfSight", false);
+		bIsPlayerSeen = false;
+		TrumpGuardCharacter->WhenPlayerUnseen();
+		Blackboard->SetValueAsBool("HasLineOfSight", bIsPlayerSeen);
 	}
 }
 
@@ -107,8 +114,9 @@ void ATrumpGuardAIController::Tick(float DeltaSeconds)
 void ATrumpGuardAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	if (const ATrumpGuardBase* TrumpGuard = Cast<ATrumpGuardBase>(InPawn))
+	if (ATrumpGuardBase* TrumpGuard = Cast<ATrumpGuardBase>(InPawn))
 	{
+		TrumpGuardCharacter = TrumpGuard;
 		if (TrumpGuard->GetBehaviorTree())
 		{
 			BehaviorTree = TrumpGuard->GetBehaviorTree();
