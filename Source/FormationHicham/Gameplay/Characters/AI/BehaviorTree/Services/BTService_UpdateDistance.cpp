@@ -25,11 +25,9 @@ void UBTService_UpdateDistance::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	{
 		if (AActor* Player = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TargetActorKey.SelectedKeyName)))
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Silver, "CALCUL DISTANCE");
 			float DistanceBetweenAiAndPlayer = FVector::Distance(TrumpGuard->GetActorLocation(), Player->GetActorLocation());
 			BB->SetValueAsFloat(DistanceKey.SelectedKeyName, DistanceBetweenAiAndPlayer);
 		}
 	}
 	
-	//BB->ClearValue(DistanceKey.SelectedKeyName);
 }

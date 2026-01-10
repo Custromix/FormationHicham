@@ -10,7 +10,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "FormationHicham/Gameplay/Items/Interface/EnemyInterface.h"
+#include "FormationHicham/Gameplay/Items/Interfaces/EnemyInterface.h"
 #include "GameFramework/Character.h"
 
 ATrumpGuardAIController::ATrumpGuardAIController()

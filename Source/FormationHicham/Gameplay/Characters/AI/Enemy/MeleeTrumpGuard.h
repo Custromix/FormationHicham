@@ -15,17 +15,29 @@ public:
 	// Sets default values for this character's properties
 	AMeleeTrumpGuard();
 
-	virtual void Attack() override;
+protected:
+	virtual void BeginPlay() override;
+	
+public:
+	virtual void StartAttack() override;
+	virtual void StopAttack() override;
+
+	void BatonTrace();
 
 protected:
-	
-	UPROPERTY(EditAnywhere)
-	float Radius;
+	UPROPERTY(EditAnywhere, Category = "Attack AI")
+	float CapsuleRadius = 12.f;
 
-	UPROPERTY(EditAnywhere)
-	UArrowComponent* ArrowStart;
+	UPROPERTY(EditAnywhere, Category = "Attack AI")
+	float LoopTime = 0.034;
+
+	UPROPERTY(EditAnywhere, Category = "Attack AI", meta=(DevelopmentOnly))
+	float DrawTime = 0.5;
+
+private:
+	TArray<UArrowComponent*> ArrowsComponents;
 	
-	UPROPERTY(EditAnywhere)
-	UArrowComponent* ArrowEnd;
-	
+	FTimerHandle TimerHandle_Attack;
+
+	bool bCanAttack = true;
 };

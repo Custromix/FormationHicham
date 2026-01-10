@@ -13,4 +13,20 @@ UCLASS()
 class FORMATIONHICHAM_API AFormationTestGameMode : public AGameMode
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void BeginPlay() override;
+	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Game Settings")
+	void RequestRestartGame();
+	
+	UFUNCTION(BlueprintCallable, Category = "Game Settings")
+	void RequestFinishGame();
+
+	void IncrementScore();
+	
+private:
+	void RestartGame();
+	void FinishGame();
 };

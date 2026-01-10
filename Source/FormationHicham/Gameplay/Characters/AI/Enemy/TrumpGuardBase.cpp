@@ -18,6 +18,12 @@ void ATrumpGuardBase::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ATrumpGuardBase::OnDeath()
+{
+	
+	Destroy();
+}
+
 void ATrumpGuardBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

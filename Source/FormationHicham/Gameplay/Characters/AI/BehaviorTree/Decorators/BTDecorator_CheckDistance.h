@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BehaviorTree/Decorators/BTDecorator_Blackboard.h"
 #include "BehaviorTree/Decorators/BTDecorator_BlackboardBase.h"
 #include "BTDecorator_CheckDistance.generated.h"
 
@@ -10,7 +11,7 @@
  * 
  */
 UCLASS()
-class FORMATIONHICHAM_API UBTDecorator_CheckDistance : public UBTDecorator_BlackboardBase
+class FORMATIONHICHAM_API UBTDecorator_CheckDistance : public UBTDecorator_Blackboard
 {
 	GENERATED_BODY()
 
@@ -22,6 +23,6 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	float MaxDistance = 80.f;
+	float MaxDistance = 125.f;
 
 };

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "WeaponDataAsset.h"
 #include "FormationHicham/Gameplay/Items/Item.h"
-#include "FormationHicham/Gameplay/Items/Interface/UsuableInterface.h"
+#include "FormationHicham/Gameplay/Items/Interfaces/UsuableInterface.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
 

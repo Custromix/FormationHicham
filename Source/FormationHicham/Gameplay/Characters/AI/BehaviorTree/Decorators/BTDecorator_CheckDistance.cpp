@@ -17,6 +17,7 @@ bool UBTDecorator_CheckDistance::CalculateRawConditionValue(UBehaviorTreeCompone
 		return false;
 
 	const float Distance = BB->GetValueAsFloat(BlackboardKey.SelectedKeyName);
+	
 	return Distance <= MaxDistance && Distance != 0;
 }
 

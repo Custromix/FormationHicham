@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
-#include "FormationHicham/Gameplay/Items/Interface/EnemyInterface.h"
+#include "FormationHicham/Gameplay/Items/Interfaces/EnemyInterface.h"
 #include "GameFramework/Character.h"
 #include "TrumpGuardBase.generated.h"
 
@@ -27,7 +27,10 @@ public:
 	UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
 
 	UFUNCTION(BlueprintCallable, Category = "Attack AI")
-	virtual void Attack() {};
+	virtual void StartAttack() {};
+	
+	UFUNCTION(BlueprintCallable, Category = "Attack AI")
+	virtual void StopAttack() {};
 	
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	UHealthComponent* GetHealthComponent() const { return HealthComponent; }
@@ -40,7 +43,7 @@ protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
-	void OnDeath() { Destroy(); }
+	void OnDeath();
 
 public:
 	UPROPERTY(BlueprintCallable, Category = "Attack AI")
@@ -59,6 +62,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float RunSpeed = 500.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	int32 ScoreAfterKill = 10;
+	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health", meta=(AllowPrivateAccess="true"))
 	UHealthComponent* HealthComponent;

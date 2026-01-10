@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Actor.h"
-#include "Interface/UsuableInterface.h"
+#include "Interfaces/UsuableInterface.h"
 #include "Item.generated.h"
  
 UENUM(BlueprintType, Blueprintable)

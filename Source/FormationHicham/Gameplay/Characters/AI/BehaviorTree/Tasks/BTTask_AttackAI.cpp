@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_AttackAI::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	
 	if (TrumpGuard)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Attaque");
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Attaque");
 		TrumpGuard->StartMontage();
 		TrumpGuard->OnAttackFinished.AddDynamic(this, &UBTTask_AttackAI::OnAttackFinished);
 		return EBTNodeResult::InProgress;
@@ -29,7 +29,7 @@ EBTNodeResult::Type UBTTask_AttackAI::AbortTask(UBehaviorTreeComponent& OwnerCom
 {
 	if (TrumpGuard)
 	{
-		TrumpGuard->StopMontage();
+		//TrumpGuard->StopMontage();
 		TrumpGuard->OnAttackFinished.RemoveDynamic(this,&UBTTask_AttackAI::OnAttackFinished);
 	}
 	
@@ -38,13 +38,17 @@ EBTNodeResult::Type UBTTask_AttackAI::AbortTask(UBehaviorTreeComponent& OwnerCom
 
 void UBTTask_AttackAI::OnAttackFinished()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Attaque FINI");
+
 	if (!CachedOwnerComponent)
 		return;
 	
 	if (!TrumpGuard)
 		return;
 
-	TrumpGuard->StopMontage();
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Attaque FINI");
+
+	//TrumpGuard->StopMontage();
 	TrumpGuard->OnAttackFinished.RemoveDynamic(this,&UBTTask_AttackAI::OnAttackFinished);
 	FinishLatentTask(*CachedOwnerComponent, EBTNodeResult::Succeeded);
 }

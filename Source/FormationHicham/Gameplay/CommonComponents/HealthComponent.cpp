@@ -37,6 +37,7 @@ void UHealthComponent::Heal(const int Heal)
 
 void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, "TakeDamage");
 	CurrentHealth -= Damage;
 	OnHealthChanged.Broadcast(CurrentHealth);
 	if (CurrentHealth <= 0.0f) OnDeath.Broadcast();

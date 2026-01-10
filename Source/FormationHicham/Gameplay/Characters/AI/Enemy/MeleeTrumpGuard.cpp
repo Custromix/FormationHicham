@@ -3,57 +3,111 @@
 
 #include "MeleeTrumpGuard.h"
 
+#include "KismetTraceUtils.h"
 #include "Components/ArrowComponent.h"
+#include "Engine/DamageEvents.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
 // Sets default values
 AMeleeTrumpGuard::AMeleeTrumpGuard()
 {
-	ArrowStart = CreateDefaultSubobject<UArrowComponent>("ArrowStart");
-	ArrowStart->SetupAttachment(RootComponent);
-	ArrowEnd = CreateDefaultSubobject<UArrowComponent>("ArrowEnd");
-	ArrowEnd->SetupAttachment(RootComponent);
 }
 
-void AMeleeTrumpGuard::Attack()
+void AMeleeTrumpGuard::BeginPlay()
 {
-	Super::Attack();
+	Super::BeginPlay();
+	GetComponents<UArrowComponent>(ArrowsComponents);
+	ArrowsComponents.RemoveAll(
+		[](UArrowComponent* Arrow)
+		{
+			return !Arrow || !Arrow->ComponentHasTag("ArrowInitializer");
+		}
+	);
+	
+}
+
+void AMeleeTrumpGuard::StartAttack()
+{
+	Super::StartAttack();
+
+	if (ArrowsComponents.IsEmpty())
+		return;
+
+	bCanAttack = true;
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_Attack,
+		this,
+		&AMeleeTrumpGuard::BatonTrace,
+		LoopTime,   
+		true
+	);
+	
+}
+
+void AMeleeTrumpGuard::StopAttack()
+{
+	Super::StopAttack();
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_Attack);
+	
+	OnAttackFinished.Broadcast();
+}
+
+void AMeleeTrumpGuard::BatonTrace()
+{
+	const FVector Start = ArrowsComponents[0]->GetComponentLocation();
+	const FVector End = ArrowsComponents[1]->GetComponentLocation();
 	
 	FHitResult SphereTraceResult;
 
-	FVector Start = ArrowStart->GetComponentLocation();
-	FVector End = ArrowEnd->GetComponentLocation();
-
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
-
 	
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "Attaque linetrace");
-	bool bHit = GetWorld()->SweepSingleByChannel(
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(
+	this,
+	Start,
+	End,
+	CapsuleRadius,
+	UEngineTypes::ConvertToTraceType(ECC_Pawn),
+	false,
+	ActorsToIgnore,
+	EDrawDebugTrace::ForDuration,
+	SphereTraceResult,
+	true,
+	FColor::Red,
+	FColor::Green,
+	DrawTime
+	);
+
+	/*bool bHit2 = GetWorld()->SweepSingleByChannel(
 	SphereTraceResult,
 	Start,
 	End,
 	FQuat::Identity,
 	ECC_Visibility,
-	FCollisionShape::MakeSphere(Radius),
-	QueryParams
-	);
-
-	DrawDebugSphere(
-		GetWorld(),
-		bHit ? SphereTraceResult.ImpactPoint : End,
-		Radius,
-		16,
-		bHit ? FColor::Red : FColor::Green,
-		false,
-		2.0f
-	);
+	FCollisionShape::MakeSphere(CapsuleRadius),
+	QueryParams);*/
+	
+	//*DrawDebugSphereTraceSingle(GetWorld(),Start, End, 12.f, EDrawDebugTrace::ForDuration, bHit2, SphereTraceResult, FColor::Red, FColor::Green, DrawTime);
 	
 	if (bHit)
 	{
-		AActor* HitActor = SphereTraceResult.GetActor();
-		UE_LOG(LogTemp, Warning, TEXT("Touché: %s"), *HitActor->GetName());
+		if (!SphereTraceResult.GetActor())
+			return;
+
+		if (bCanAttack)
+		{
+			FDamageEvent DamageEvent;
+			SphereTraceResult.GetActor()->TakeDamage(10.f, DamageEvent, GetController(), this);
+			bCanAttack = false;
+		}
 	}
 }
+
+
 
