@@ -23,10 +23,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Game Settings")
 	void RequestFinishGame();
-
-	void IncrementScore();
 	
 private:
 	void RestartGame();
 	void FinishGame();
+
 };

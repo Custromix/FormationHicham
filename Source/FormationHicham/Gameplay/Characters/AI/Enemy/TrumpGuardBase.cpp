@@ -1,6 +1,7 @@
 // TrumpGuard.cpp
 #include "TrumpGuardBase.h"
 
+#include "FormationHicham/Core/GameMode/FormationTestGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ATrumpGuardBase::ATrumpGuardBase()
@@ -16,10 +17,19 @@ ATrumpGuardBase::ATrumpGuardBase()
 void ATrumpGuardBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	/*if (!FormationGameState)
+		FormationGameState = Cast<AFormationTestGameState>(GetWorld()->GetGameState());*/
+	
 }
 
 void ATrumpGuardBase::OnDeath()
 {
+	/*if (FormationGameState)
+		FormationGameState->IncrementScore(ScoreAfterKill);*/
+
+	AFormationTestGameState* FormationGameState = GetWorld()->GetGameState<AFormationTestGameState>();
+	FormationGameState->IncrementScore(ScoreAfterKill);
 	
 	Destroy();
 }

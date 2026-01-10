@@ -23,8 +23,10 @@ protected:
 	virtual void Reset() override;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Score")
 	int32 GetGlobalScore () const { return GlobalScore; }
-	void SetGlobalScore(const int32 GlobalScore) { this->GlobalScore = GlobalScore; }
+	
+	void IncrementScore(const int32 AddedScore);
 
 private:
 	int32 GlobalScore = 0;

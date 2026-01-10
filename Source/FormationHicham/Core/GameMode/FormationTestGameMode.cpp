@@ -25,12 +25,6 @@ void AFormationTestGameMode::RequestFinishGame()
 		FinishGame();
 }
 
-void AFormationTestGameMode::IncrementScore()
-{
-	GameState->getscpr
-	score
-}
-
 void AFormationTestGameMode::RestartGame()
 {
 	const FName CurrentLevelName = *GetWorld()->GetName();

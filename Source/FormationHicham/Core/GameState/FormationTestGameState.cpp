@@ -21,3 +21,9 @@ void AFormationTestGameState::Reset()
 	Super::Reset();
 }
 
+void AFormationTestGameState::IncrementScore(const int32 AddedScore)
+{
+	this->GlobalScore += AddedScore;
+	GEngine->AddOnScreenDebugMessage(3, 5, FColor::Purple, FString::Printf(TEXT("Score Incremented : %i" ), GlobalScore));
+}
+

@@ -3,8 +3,8 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "FormationHicham/Core/GameState/FormationTestGameState.h"
 #include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
-#include "FormationHicham/Gameplay/Items/Interfaces/EnemyInterface.h"
 #include "GameFramework/Character.h"
 #include "TrumpGuardBase.generated.h"
 
@@ -50,6 +50,9 @@ public:
 	FOnAttackFinished OnAttackFinished;
 	
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
+	UHealthComponent* HealthComponent;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	UBehaviorTree* BehaviorTree;
 
@@ -66,6 +69,6 @@ protected:
 	int32 ScoreAfterKill = 10;
 	
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health", meta=(AllowPrivateAccess="true"))
-	UHealthComponent* HealthComponent;
+
+	//static AFormationTestGameState* FormationGameState;
 };
