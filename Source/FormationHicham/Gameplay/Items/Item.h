@@ -3,26 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/CapsuleComponent.h"
+#include "Datas/ItemData.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/UsuableInterface.h"
 #include "Item.generated.h"
- 
-UENUM(BlueprintType, Blueprintable)
-enum class EItemType : uint8
-{
-	WEAPON      UMETA(DisplayName = "Weapon"),
-	AMMO        UMETA(DisplayName = "Ammo"),
-	CONSUMABLE  UMETA(DisplayName = "Consumable"),
-	GRENADE  UMETA(DisplayName = "Grenade"),
-};
 
-UENUM(BlueprintType, Blueprintable)
-enum class EStatus : uint8
-{
-	NONE,
-	ONGRAB,
-};
+enum class EItemType : uint8;
 
 UCLASS(Abstract)
 class FORMATIONHICHAM_API AItem : public AActor
@@ -30,29 +15,44 @@ class FORMATIONHICHAM_API AItem : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AItem();
+	virtual void Initialize(UItemData* AItemData);
 
 protected:
-	
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	//USceneComponent* SceneRoot;
-	
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//UCapsuleComponent* GrabberCollider;
+	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USkeletalMeshComponent* ItemMesh;
-	
-	EItemType ItemType;
-	
-	EStatus Status;
+	UItemData* GetItemData() const { return ItemData; }
 	
 public:
+	void SetActive(bool bChoice);
+	bool IsActive() const { return bIsActive; }
+
+	UItemData* GetItemData() { return ItemData; }
 	
-	virtual void OnGrab();
-	virtual void OnRelease();
+	FName GetItemName() const { return ItemName; }
 
 	EItemType GetItemType() const { return ItemType; }
-	EStatus GetStatus() const { return Status; }
+
+	TObjectPtr<USkeletalMeshComponent> GetSkeletalMesh() const { return ItemMesh; }
+	
+private:
+	bool bIsGoingUp = true;
+	FVector StartLocation;
+	
+	float TempZLocation;
+	float TempPitchRotation;
+
+	bool bIsActive = true;
+
+	UPROPERTY()
+	TObjectPtr<UItemData> ItemData;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USkeletalMeshComponent* ItemMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ItemName;
+	
+	EItemType ItemType;
 };

@@ -7,32 +7,51 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
+#include "FormationHicham/Gameplay/Items/Melee/Melee.h"
+#include "FormationHicham/Gameplay/Items/PickupItem/PickupItem.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AHichamCharacter::AHichamCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(GetCapsuleComponent());
-	Camera->bUsePawnControlRotation = true;
 
+	Pivot = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
+	Pivot->SetupAttachment(GetCapsuleComponent());
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(Pivot);
+	
 	CharacterMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
-	CharacterMesh1P->SetupAttachment(Camera);
+	CharacterMesh1P->SetupAttachment(Pivot);
+	
+	DropItemLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Drop Item Start"));
+	DropItemLocation->SetupAttachment(Camera);
 
 	Inventory = CreateDefaultSubobject<UInventoryPlayerSystemComponent>(TEXT("Inventory"));
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
-
 	
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHichamCharacter::OnOverlapBegin);
+	bUseControllerRotationYaw = true;
+}
+
+bool AHichamCharacter::TryPickupItem(UItemData* Item)
+{
+	if (!Item)
+		return false;
+	
+	return Inventory->RequestAddItem(Item);
 }
 
 // Called when the game starts or when spawned
 void AHichamCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	GenericTeamID = (uint8)TeamID;
+	GenericTeamID = static_cast<uint8>(TeamID);
+
+	Inventory->OnItemAdded.AddDynamic(this, &AHichamCharacter::OnItemAdded);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Hello World!");
 }
 
 void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -48,22 +67,21 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		
 		EnhancedPlayerInputComponent->BindAction(FirstUseAction, ETriggerEvent::Started, this, &AHichamCharacter::FirstUse);
 		
-		EnhancedPlayerInputComponent->BindAction(SecondUseAction, ETriggerEvent::Started, this, &AHichamCharacter::SecondUse);
+		EnhancedPlayerInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AHichamCharacter::Aim);
 		
 		EnhancedPlayerInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &AHichamCharacter::Reload);
 
 		EnhancedPlayerInputComponent->BindAction(DropAction, ETriggerEvent::Started, this, &AHichamCharacter::DropItem);
 		
-		EnhancedPlayerInputComponent->BindAction(SwitchItemAction, ETriggerEvent::Started, this, &AHichamCharacter::SwitchItem);
-	}else
-	{
-		//UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		EnhancedPlayerInputComponent->BindAction(NextItemAction, ETriggerEvent::Started, this, &AHichamCharacter::NextItem);
+		
+		EnhancedPlayerInputComponent->BindAction(PreviousItemAction, ETriggerEvent::Started, this, &AHichamCharacter::PreviousItem);
 	}
 }
 
 void AHichamCharacter::Move(const FInputActionValue& Value)
 {
-	FVector2D Movement = Value.Get<FVector2D>();
+	const FVector2D Movement = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -74,7 +92,7 @@ void AHichamCharacter::Move(const FInputActionValue& Value)
 
 void AHichamCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2D LookAxis = Value.Get<FVector2D>();
+	const FVector2D LookAxis = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -83,60 +101,105 @@ void AHichamCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void AHichamCharacter::FirstUse()
+void AHichamCharacter::OnItemAdded(UItemData* CurrentItemData)
 {
-	if (Inventory->GetMainItem())
-		Inventory->GetMainItem()->Fire(Camera->GetComponentLocation(), Camera->GetForwardVector());
+	if (!EquippedItemActor)
+		Equip(CurrentItemData);
 }
 
-void AHichamCharacter::SecondUse()
+void AHichamCharacter::Equip(UItemData* CurrentItemData)
 {
-	if (Inventory->GetMainItem())
-		Inventory->GetMainItem()->Aim();
+	if (!CurrentItemData)
+		return;
+	
+	if (EquippedItemActor)
+	{
+		EquippedItemActor->Destroy();
+		EquippedItemActor = nullptr;
+	}
+	
+	FActorSpawnParameters Params;
+	Params.Owner = this;
+	
+	EquippedItemActor = GetWorld()->SpawnActor<AItem>(CurrentItemData->ItemClass, Params);
+	EquippedItemActor->Initialize(CurrentItemData);
+	
+	EquippedItemActor->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentItemData->SocketName);
+}
+
+void AHichamCharacter::FirstUse()
+{
+	if (EquippedItemActor && EquippedItemActor->Implements<UUsuableInterface>())
+		IUsuableInterface::Execute_Use(EquippedItemActor, Camera);
+}
+
+void AHichamCharacter::Aim()
+{
+	if (EquippedItemActor && EquippedItemActor->Implements<UAimableInterface>())
+		IAimableInterface::Execute_Aim(EquippedItemActor);
 }
 
 void AHichamCharacter::Reload()
 {
-	if (Inventory->GetMainItem())
-		Inventory->GetMainItem()->Reload();
+	if (EquippedItemActor && EquippedItemActor->Implements<UReloadableInterface>())
+		IReloadableInterface::Execute_Reload(EquippedItemActor);
 }
 
 void AHichamCharacter::DropItem()
 {
-	if (Inventory->GetMainItem())
-	{
-		Inventory->DropMainItem(Camera->GetForwardVector());
-		FVector de = GetActorForwardVector();
-	}
+	if (!EquippedItemActor)
+		return;
+
+	if (!EquippedItemActor->GetItemData()->bIsDroppable)
+		return;
+
+	/* Span Item Physically */
+	FActorSpawnParameters Params;
+	Params.Owner = this;
+	
+	APickupItem* DroppedActor = GetWorld()->SpawnActor<APickupItem>(Params);
+	DroppedActor->Initialize(EquippedItemActor->GetItemData());
+	DroppedActor->SetActorLocation(DropItemLocation->GetComponentLocation(), false, nullptr, ETeleportType::TeleportPhysics);
+
+	/* Drop Item */
+	FVector CameraForwardVector = Camera->GetForwardVector();
+	CameraForwardVector.Normalize();
+	
+	FVector Impulse = CameraForwardVector * DroppingForce;
+	DroppedActor->GetSkeletalMesh()->AddImpulse(FVector(Impulse));
+
+	Inventory->RemoveItemFromInventory(Inventory->GetCurrentItemData());
+
+	Equip(Inventory->GetCurrentItemData());
 }
 
-void AHichamCharacter::SwitchItem(const FInputActionValue& Value)
+void AHichamCharacter::NextItem()
 {
-	//Inventory->GetMainItem()->SecondUse(this);
+	if (!EquippedItemActor)
+		return;
+
+	if (Inventory->GetSwitchList().Num() <= 1)
+		return;
+		
+	if (UItemData* NewItemData = Inventory->GetNextItemData())
+		Equip(NewItemData);
+}
+
+void AHichamCharacter::PreviousItem()
+{
+	if (!EquippedItemActor)
+		return;
+
+	if (Inventory->GetSwitchList().Num() <= 1)
+		return;
+	
+	if (UItemData* NewItemData = Inventory->GetPreviousItem())
+		Equip(NewItemData);
 }
 
 // Called every frame
 void AHichamCharacter::Tick(float DeltaTime)
 {
 	//Super::Tick(DeltaTime);
-}
-
-// Called to bind functionality to input
-
-
-void AHichamCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-										 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-										 bool bFromSweep, const FHitResult& SweepResult)
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Silver, "Colide");
-
-	if (AItem* Item = Cast<AItem>(OtherActor))
-	{
-		if (Item->GetStatus() == EStatus::NONE)
-		{
-			Inventory->AddItem(Item);
-			Item->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, "S_Riffle");
-			Item->OnGrab();
-		}
-	}
+	Pivot->SetRelativeRotation(FRotator(GetControlRotation().Pitch, 0, 0));
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "UObject/Interface.h"
 #include "UsuableInterface.generated.h"
 
@@ -20,17 +21,7 @@ class FORMATIONHICHAM_API IUsuableInterface
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Item Use")
+	void Use(UCameraComponent* PlayerCamera);
 
-	// Ces fonctions doivent être implémentées dans les classes qui héritent
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
-	void FirstUse(class AHichamCharacter* HichamCharacter);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
-	void SecondUse(class AHichamCharacter* HichamCharacter);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
-	void ThirdUse(class AHichamCharacter* HichamCharacter);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Usable")
-	void Drop();
 };

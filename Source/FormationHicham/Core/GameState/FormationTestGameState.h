@@ -6,8 +6,10 @@
 #include "GameFramework/GameState.h"
 #include "FormationTestGameState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScoreChanged, int, Score);
+
 /**
- * 
+ * GameState of game
  */
 UCLASS()
 class FORMATIONHICHAM_API AFormationTestGameState : public AGameState
@@ -25,6 +27,9 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	int32 GetGlobalScore () const { return GlobalScore; }
+
+	UPROPERTY(BlueprintAssignable, Category = "Delegates")
+	FOnScoreChanged OnScoreChanged;
 	
 	void IncrementScore(const int32 AddedScore);
 

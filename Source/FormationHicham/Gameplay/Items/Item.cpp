@@ -6,33 +6,31 @@
 // Sets default values
 AItem::AItem()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need i
-	PrimaryActorTick.bCanEverTick = true;
-	
-	//SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
-	//GrabberCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Grabber Collider"));
-	//RootComponent = GrabberCollider;
-
-	//GrabberCollider->SetupAttachment(RootComponent);
-	//GrabberCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
-	// SkeletalMesh attaché à Root aussi (indépendant de la capsule)
 	ItemMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
-	RootComponent = ItemMesh;
-	//ItemMesh->SetupAttachment(RootComponent);
-
-	Status = EStatus::NONE;
+	ItemMesh->SetupAttachment(RootComponent);
 }
 
-void AItem::OnGrab()
+void AItem::Initialize(UItemData* AItemData)
 {
-	//GrabberCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Status = EStatus::ONGRAB;
+	ItemData = AItemData;
+	
+	ItemMesh->SetSkeletalMesh(ItemData->ItemMesh);
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void AItem::OnRelease()
+void AItem::BeginPlay()
 {
-	//GrabberCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Super::BeginPlay();
+	StartLocation = GetActorLocation();
 }
+
+void AItem::SetActive(const bool bChoice)
+{
+	SetActorHiddenInGame(!bChoice);
+	SetActorEnableCollision(bChoice);
+	SetActorTickEnabled(bChoice);
+	bIsActive = bChoice;
+}
+
 
 

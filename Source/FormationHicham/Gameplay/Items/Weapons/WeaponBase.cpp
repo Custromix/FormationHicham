@@ -4,44 +4,20 @@
 #include "WeaponBase.h"
 
 #include "Engine/DamageEvents.h"
+#include "FormationHicham/Gameplay/Items/EItemType.h"
 
 AWeaponBase::AWeaponBase()
 {
 	ItemType = EItemType::WEAPON;
-	//GrabberCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnOverlapBegin);
-	//GrabberCollider->OnComponentEndOverlap.AddDynamic(this, &AWeaponBase::OnOverlapEnd);
-	//GrabberCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnOverlapBegin);
-	//ItemMesh->OnComponentHit.AddDynamic(this, &AWeaponBase::OnHit);
+	
 }
 
-
-void AWeaponBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AWeaponBase::Initialize(UItemData* AItemData)
 {
-	/*if (OtherComp->ComponentHasTag("Ground"))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Ground");
-	}
-	if (OverlappedComp->ComponentHasTag("Ground"))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Ground");
-		
-		if (Status == EStatus::ONGRAB)
-		{
-			ItemMesh->SetSimulatePhysics(false);
-			ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			Status = EStatus::NONE;
-		}
-	}*/
-}
+	Super::Initialize(AItemData);
 
-void AWeaponBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-				  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-}
-
-void AWeaponBase::OnHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor)
-{
+	if (AItemData)
+		WeaponInfoDataAsset = Cast<UWeaponDataAsset>(AItemData);
 }
 
 // Called when the game starts or when spawned
@@ -51,13 +27,24 @@ void AWeaponBase::BeginPlay()
 }
 
 // Called every frame
-void AWeaponBase::Tick(float DeltaTime)
+void AWeaponBase::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
 void AWeaponBase::Fire(FVector Start, FVector End)
 {
+	
+}
+
+void AWeaponBase::Use_Implementation(UCameraComponent* PlayerCamera)
+{
+	if (!WeaponInfoDataAsset)
+		return;
+	
+	FVector Start = PlayerCamera->GetComponentLocation();
+	FVector End = PlayerCamera->GetForwardVector();
+	
 	FHitResult HitResult;
 	
 	FCollisionQueryParams Params;
@@ -88,40 +75,21 @@ void AWeaponBase::Fire(FVector Start, FVector End)
 	else DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 2.0f);
 }
 
-void AWeaponBase::Aim()
+void AWeaponBase::Aim_Implementation()
 {
+	IAimableInterface::Aim_Implementation();
 }
 
-void AWeaponBase::Reload()
+void AWeaponBase::Reload_Implementation()
 {
+	IReloadableInterface::Reload_Implementation();
 }
 
-void AWeaponBase::OnGrab()
-{
-	Super::OnGrab();
-	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
-
-void AWeaponBase::Drop(FVector CameraForwardVector)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Dropped");
-	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	CameraForwardVector.Normalize();
-	FVector Impulse = CameraForwardVector * 2000.f;
-	ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	ItemMesh->SetSimulatePhysics(true);
-	ItemMesh->AddImpulse(FVector(Impulse));
-	OnRelease();
-}
-
-void AWeaponBase::ServerHandleFire_Implementation(FVector3d ViewportSize)
+void AWeaponBase::ServerHandleFire_Implementation(const FVector3d ViewportSize)
 {
 	FHitResult HitResult;
-	FVector Start = ViewportSize;   // Position de départ (souvent la caméra)
-	FVector End = ViewportSize;     // Position d’arrivée (Start + direction * distance)
-	
-	
-	// Et ensuite :
+	const FVector Start = ViewportSize;
+	const FVector End = ViewportSize;
 	
 	bool bHit = GetWorld()->LineTraceSingleByChannel(
 	HitResult,

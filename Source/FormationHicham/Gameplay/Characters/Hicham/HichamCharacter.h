@@ -7,8 +7,8 @@
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
 #include "FormationHicham/Gameplay/Characters/Enum/ETeam.h"
-#include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
-#include "FormationHicham/Gameplay/Systems/Inventory/InventoryPlayerSystemComponent.h"
+#include "FormationHicham/Gameplay/CommonComponents/HealthComponent/HealthComponent.h"
+#include "FormationHicham/Gameplay/CommonComponents/InventoryComponent/InventoryPlayerSystemComponent.h"
 #include "GameFramework/Character.h"
 #include "HichamCharacter.generated.h"
 
@@ -29,52 +29,72 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnItemAdded(UItemData* CurrentItemData);
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void Equip(UItemData* CurrentItemData);
 	void FirstUse();
-	void SecondUse();
+	void Aim();
 	void Reload();
 	void DropItem();
-	void SwitchItem(const FInputActionValue& Value);
-	
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-						bool bFromSweep, const FHitResult& SweepResult);
+	void NextItem();
+	void PreviousItem();
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	bool TryPickupItem(UItemData* Item);
 	
 	virtual FGenericTeamId GetGenericTeamId() const override { return GenericTeamID; }
 	
 protected:
+	/* Player Stuff */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Global")
+	USceneComponent* Pivot;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh)
 	USkeletalMeshComponent* CharacterMesh1P;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UCameraComponent* Camera;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health)
+	UHealthComponent* HealthComponent;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Inventory)
 	UInventoryPlayerSystemComponent* Inventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health)
-	UHealthComponent* HealthComponent;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	TObjectPtr<AItem> EquippedItemActor;
 	
-	/* Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	USceneComponent* DropItemLocation;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
+	ETeamType TeamID = ETeamType::Player;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
+	float DroppingForce = 1500.f;
+	
+	#pragma region Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* MoveAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* FirstUseAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
-	UInputAction* SecondUseAction;
+	UInputAction* AimAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* ReloadAction;
@@ -83,10 +103,11 @@ protected:
 	UInputAction* DropAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
-	UInputAction* SwitchItemAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
-	ETeamType TeamID = ETeamType::Player;
+	UInputAction* NextItemAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
+	UInputAction* PreviousItemAction;
+	#pragma endregion
 
 private:
 	UPROPERTY()

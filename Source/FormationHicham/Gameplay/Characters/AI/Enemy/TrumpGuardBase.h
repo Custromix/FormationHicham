@@ -3,8 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BehaviorTree.h"
-#include "FormationHicham/Core/GameState/FormationTestGameState.h"
-#include "FormationHicham/Gameplay/CommonComponents/HealthComponent.h"
+#include "FormationHicham/Gameplay/CommonComponents/HealthComponent/HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "TrumpGuardBase.generated.h"
 
