@@ -17,6 +17,12 @@ class FORMATIONHICHAM_API ATrumpGuardBase : public ACharacter
 public:
 	ATrumpGuardBase();
 
+protected:
+	virtual void BeginPlay() override;
+	
+	UFUNCTION()
+	void OnDeath();
+	
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -37,16 +43,8 @@ public:
 	void StartMontage() const { GetMesh()->GetAnimInstance()->Montage_Play(AttackAnimMontage); }
 	void StopMontage() const { GetMesh()->GetAnimInstance()->Montage_Stop(0.2f, AttackAnimMontage); }
 
-
-protected:
-	virtual void BeginPlay() override;
-	
-	UFUNCTION()
-	void OnDeath();
-
-public:
-	UPROPERTY(BlueprintCallable, Category = "Attack AI")
-	FOnAttackFinished OnAttackFinished;
+private:
+	//static AFormationTestGameState* FormationGameState;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
@@ -66,8 +64,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	int32 ScoreAfterKill = 10;
-	
-private:
 
-	//static AFormationTestGameState* FormationGameState;
+public:
+	UPROPERTY(BlueprintCallable, Category = "Attack AI")
+	FOnAttackFinished OnAttackFinished;
+
 };

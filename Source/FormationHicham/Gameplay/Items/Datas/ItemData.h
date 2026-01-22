@@ -42,4 +42,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsDroppable = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bIsAimable = true;
 };

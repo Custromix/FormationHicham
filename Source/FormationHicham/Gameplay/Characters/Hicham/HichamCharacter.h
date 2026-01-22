@@ -10,7 +10,10 @@
 #include "FormationHicham/Gameplay/CommonComponents/HealthComponent/HealthComponent.h"
 #include "FormationHicham/Gameplay/CommonComponents/InventoryComponent/InventoryPlayerSystemComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "HichamCharacter.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemSwitch, FTransform, LHIKTransform);
 
 UCLASS()
 class FORMATIONHICHAM_API AHichamCharacter : public ACharacter, public IGenericTeamAgentInterface
@@ -42,6 +45,8 @@ protected:
 	void NextItem();
 	void PreviousItem();
 
+	FTransform GetItemSocketTransformInnMeshSpace();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -50,6 +55,10 @@ public:
 	bool TryPickupItem(UItemData* Item);
 	
 	virtual FGenericTeamId GetGenericTeamId() const override { return GenericTeamID; }
+
+private:
+	UPROPERTY()
+	FGenericTeamId GenericTeamID;
 	
 protected:
 	/* Player Stuff */
@@ -58,7 +67,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh)
 	USkeletalMeshComponent* CharacterMesh1P;
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	USpringArmComponent* SpringArm;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UCameraComponent* Camera;
 	
@@ -109,7 +121,10 @@ protected:
 	UInputAction* PreviousItemAction;
 	#pragma endregion
 
-private:
-	UPROPERTY()
-	FGenericTeamId GenericTeamID;
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsAiming = false;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnItemSwitch OnItemSwitch;
 };

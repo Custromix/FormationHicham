@@ -33,15 +33,12 @@ public:
 	void RemoveItemFromInventory(const TObjectPtr<UItemData>& ItemData);
 
 	TArray<TObjectPtr<UItemData>> GetSwitchList() { return SwitchList; }
-
+	
 	TObjectPtr<UItemData> GetCurrentItemData();
 	TObjectPtr<UItemData> GetNextItemData();
 	TObjectPtr<UItemData> GetPreviousItem();
 
-	FOnItemAdded OnItemAdded;
-
 private:
-	
 	TMap<TObjectPtr<UItemData>, int32> ItemInventory;
 	TMap<EAmmoType, int32> AmmoInventoryMap;
 
@@ -55,5 +52,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Init")
 	int MaxConsumable = 4;
-	
+
+public:
+	FOnItemAdded OnItemAdded;
 };

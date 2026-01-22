@@ -20,8 +20,11 @@ AHichamCharacter::AHichamCharacter()
 	Pivot = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
 	Pivot->SetupAttachment(GetCapsuleComponent());
 
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Boom"));
+	SpringArm->SetupAttachment(Pivot);
+	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(Pivot);
+	Camera->SetupAttachment(SpringArm);
 	
 	CharacterMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
 	CharacterMesh1P->SetupAttachment(Pivot);
@@ -125,6 +128,9 @@ void AHichamCharacter::Equip(UItemData* CurrentItemData)
 	EquippedItemActor->Initialize(CurrentItemData);
 	
 	EquippedItemActor->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentItemData->SocketName);
+
+	FTransform LHIKTransform = GetItemSocketTransformInnMeshSpace();
+	OnItemSwitch.Broadcast(LHIKTransform);
 }
 
 void AHichamCharacter::FirstUse()
@@ -135,8 +141,25 @@ void AHichamCharacter::FirstUse()
 
 void AHichamCharacter::Aim()
 {
-	if (EquippedItemActor && EquippedItemActor->Implements<UAimableInterface>())
-		IAimableInterface::Execute_Aim(EquippedItemActor);
+	if (!EquippedItemActor && !EquippedItemActor->GetItemData()->bIsAimable)
+		return;
+	
+	if (!bIsAiming)
+	{
+		bIsAiming = true;
+		//CharacterMesh1P->SetRelativeLocation(FVector(7.f, -4.551458f, -147.f));
+	}
+	else
+	{
+		bIsAiming = false;
+		//CharacterMesh1P->SetRelativeLocation(FVector(7.f, -4.551458f, -147.f));
+	}
+
+	
+	
+	//if (!EquippedItemActor || EquippedItemActor->Implements<UAimableInterface>())
+	
+	//IAimableInterface::Execute_Aim(EquippedItemActor);
 }
 
 void AHichamCharacter::Reload()
@@ -195,6 +218,20 @@ void AHichamCharacter::PreviousItem()
 	
 	if (UItemData* NewItemData = Inventory->GetPreviousItem())
 		Equip(NewItemData);
+}
+
+FTransform AHichamCharacter::GetItemSocketTransformInnMeshSpace()
+{
+	if (!EquippedItemActor || !CharacterMesh1P)
+		return FTransform::Identity;
+
+	FTransform LHIK = EquippedItemActor->GetSkeletalMesh()->GetSocketTransform("LHIK");
+
+	FVector LHIKLocationInMeshSpace;
+	FRotator LHIKRotatorInMeshSpace;
+	CharacterMesh1P->TransformToBoneSpace("hand_r", LHIK.GetLocation(), LHIK.Rotator(), LHIKLocationInMeshSpace, LHIKRotatorInMeshSpace);
+	
+	return FTransform(LHIKRotatorInMeshSpace, LHIKLocationInMeshSpace, FVector::OneVector);
 }
 
 // Called every frame
