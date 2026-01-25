@@ -21,13 +21,16 @@ public:
 	FVector PositionOffset;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Offset)
-	FVector RotationOffset;
+	FRotator RotationOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Offset)
 	FVector PositionAimOffset;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Offset)
-	FVector RotationAimOffset;
+	FRotator RotationAimOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Offset)
+	float AlphaIK;
 
 	/* Animation Character */
 	
