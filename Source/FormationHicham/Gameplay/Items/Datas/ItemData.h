@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Animation/ItemAnimationData.h"
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
@@ -10,7 +11,7 @@ enum class EItemType : uint8;
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class FORMATIONHICHAM_API UItemData : public UDataAsset
 {
 	GENERATED_BODY()
@@ -45,4 +46,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsAimable = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UItemAnimationData* AnimationData;
 };

@@ -45,7 +45,8 @@ protected:
 	void NextItem();
 	void PreviousItem();
 
-	FTransform GetItemSocketTransformInnMeshSpace();
+	UFUNCTION(BlueprintCallable, Category="Animation")
+	FTransform GetItemSocketTransformInMeshSpace(const FName SocketName);
 
 public:
 	// Called every frame
@@ -62,34 +63,34 @@ private:
 	
 protected:
 	/* Player Stuff */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Global")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Global")
 	USceneComponent* Pivot;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Mesh)
 	USkeletalMeshComponent* CharacterMesh1P;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Camera)
 	USpringArmComponent* SpringArm;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
 	UCameraComponent* Camera;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Health)
 	UHealthComponent* HealthComponent;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Inventory)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Inventory)
 	UInventoryPlayerSystemComponent* Inventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Gameplay)
 	TObjectPtr<AItem> EquippedItemActor;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Gameplay)
 	USceneComponent* DropItemLocation;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AI")
 	ETeamType TeamID = ETeamType::Player;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AI")
 	float DroppingForce = 1500.f;
 	
 	#pragma region Input Action

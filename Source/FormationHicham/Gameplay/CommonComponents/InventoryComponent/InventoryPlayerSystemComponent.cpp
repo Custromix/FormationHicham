@@ -46,7 +46,7 @@ int UInventoryPlayerSystemComponent::GetNbrItemsByType(const EItemType ItemType)
 {
 	int NbrItemType = 0;
 	
-	for (const TPair<TObjectPtr<UItemData>, int32>& Item : ItemInventory)
+	for (const TPair<UItemData*, int32>& Item : ItemInventory)
 	{
 		if (Item.Value != 0 && Item.Key && Item.Key->ItemType == ItemType)
 			NbrItemType++;
@@ -84,7 +84,7 @@ void UInventoryPlayerSystemComponent::RebuildSwitchList()
 		CurrentItemIndex = INDEX_NONE;
 }
 
-bool UInventoryPlayerSystemComponent::RequestAddItem(const TObjectPtr<UItemData>& ItemData)
+bool UInventoryPlayerSystemComponent::RequestAddItem(UItemData* ItemData)
 {
 	if (!ItemData)
 		return false;
@@ -145,7 +145,7 @@ bool UInventoryPlayerSystemComponent::RequestAddItem(const TObjectPtr<UItemData>
 	}
 }
 
-TObjectPtr<UItemData> UInventoryPlayerSystemComponent::GetCurrentItemData()
+UItemData* UInventoryPlayerSystemComponent::GetCurrentItemData()
 {
 	if (!SwitchList.IsValidIndex(CurrentItemIndex))
 		return nullptr;
@@ -153,7 +153,7 @@ TObjectPtr<UItemData> UInventoryPlayerSystemComponent::GetCurrentItemData()
 	return SwitchList[CurrentItemIndex];
 }
 
-TObjectPtr<UItemData> UInventoryPlayerSystemComponent::GetNextItemData()
+UItemData* UInventoryPlayerSystemComponent::GetNextItemData()
 {
 	if (!SwitchList.IsValidIndex(CurrentItemIndex))
 		return nullptr;
@@ -163,7 +163,7 @@ TObjectPtr<UItemData> UInventoryPlayerSystemComponent::GetNextItemData()
 	return SwitchList[CurrentItemIndex];
 }
 
-TObjectPtr<UItemData> UInventoryPlayerSystemComponent::GetPreviousItem()
+UItemData* UInventoryPlayerSystemComponent::GetPreviousItem()
 {
 	if (!SwitchList.IsValidIndex(CurrentItemIndex))
 		return nullptr;
@@ -173,7 +173,7 @@ TObjectPtr<UItemData> UInventoryPlayerSystemComponent::GetPreviousItem()
 	return SwitchList[CurrentItemIndex];
 }
 
-void UInventoryPlayerSystemComponent::RemoveItemFromInventory(const TObjectPtr<UItemData>& ItemData)
+void UInventoryPlayerSystemComponent::RemoveItemFromInventory(const UItemData* ItemData)
 {
 	CurrentItemIndex = 0;
 	int32& QuantityLeft = *ItemInventory.Find(ItemData);

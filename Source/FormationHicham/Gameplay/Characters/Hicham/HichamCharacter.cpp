@@ -126,10 +126,10 @@ void AHichamCharacter::Equip(UItemData* CurrentItemData)
 	
 	EquippedItemActor = GetWorld()->SpawnActor<AItem>(CurrentItemData->ItemClass, Params);
 	EquippedItemActor->Initialize(CurrentItemData);
-	
-	EquippedItemActor->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentItemData->SocketName);
 
-	FTransform LHIKTransform = GetItemSocketTransformInnMeshSpace();
+	const bool IsAttach = EquippedItemActor->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentItemData->SocketName);
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Is Attach : %hs"), IsAttach ? "true" : "false"));
+	FTransform LHIKTransform = GetItemSocketTransformInMeshSpace("LHIK");
 	OnItemSwitch.Broadcast(LHIKTransform);
 }
 
@@ -147,12 +147,10 @@ void AHichamCharacter::Aim()
 	if (!bIsAiming)
 	{
 		bIsAiming = true;
-		//CharacterMesh1P->SetRelativeLocation(FVector(7.f, -4.551458f, -147.f));
 	}
 	else
 	{
 		bIsAiming = false;
-		//CharacterMesh1P->SetRelativeLocation(FVector(7.f, -4.551458f, -147.f));
 	}
 
 	
@@ -220,12 +218,12 @@ void AHichamCharacter::PreviousItem()
 		Equip(NewItemData);
 }
 
-FTransform AHichamCharacter::GetItemSocketTransformInnMeshSpace()
+FTransform AHichamCharacter::GetItemSocketTransformInMeshSpace(const FName SocketName)
 {
 	if (!EquippedItemActor || !CharacterMesh1P)
 		return FTransform::Identity;
 
-	FTransform LHIK = EquippedItemActor->GetSkeletalMesh()->GetSocketTransform("LHIK");
+	FTransform LHIK = EquippedItemActor->GetSkeletalMesh()->GetSocketTransform(SocketName);
 
 	FVector LHIKLocationInMeshSpace;
 	FRotator LHIKRotatorInMeshSpace;

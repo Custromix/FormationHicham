@@ -27,6 +27,7 @@ public:
 	void SetActive(bool bChoice);
 	bool IsActive() const { return bIsActive; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UItemData* GetItemData() { return ItemData; }
 	
 	FName GetItemName() const { return ItemName; }
@@ -44,14 +45,14 @@ private:
 
 	bool bIsActive = true;
 
-	UPROPERTY()
-	TObjectPtr<UItemData> ItemData;
-
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USkeletalMeshComponent* ItemMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UItemData* ItemData;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName ItemName;
 	
 	EItemType ItemType;

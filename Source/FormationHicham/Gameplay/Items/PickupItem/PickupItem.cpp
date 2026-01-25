@@ -20,6 +20,13 @@ APickupItem::APickupItem()
 	ItemMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
+void APickupItem::Initialize(UItemData* Data)
+{
+	ItemData = Data;
+	ItemMesh->SetSkeletalMesh(ItemData->ItemMesh);
+	ItemMesh->SetSimulatePhysics(true);
+}
+
 // Called when the game starts or when spawned
 void APickupItem::BeginPlay()
 {
@@ -50,12 +57,6 @@ void APickupItem::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Ot
 		Destroy();
 }
 
-void APickupItem::Initialize(UItemData* Data)
-{
-	ItemData = Data;
-	ItemMesh->SetSkeletalMesh(ItemData->ItemMesh);
-	ItemMesh->SetSimulatePhysics(true);
-}
 
 /*void APickupItem::Tick(float DeltaTime)
 {

@@ -29,20 +29,22 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
-	bool RequestAddItem(const TObjectPtr<UItemData>& ItemData);
-	void RemoveItemFromInventory(const TObjectPtr<UItemData>& ItemData);
+	bool RequestAddItem(UItemData* ItemData);
+	void RemoveItemFromInventory(const UItemData* ItemData);
 
-	TArray<TObjectPtr<UItemData>> GetSwitchList() { return SwitchList; }
+	TArray<UItemData*> GetSwitchList() { return SwitchList; }
 	
-	TObjectPtr<UItemData> GetCurrentItemData();
-	TObjectPtr<UItemData> GetNextItemData();
-	TObjectPtr<UItemData> GetPreviousItem();
+	UItemData* GetCurrentItemData();
+	UItemData* GetNextItemData();
+	UItemData* GetPreviousItem();
 
 private:
-	TMap<TObjectPtr<UItemData>, int32> ItemInventory;
+	UPROPERTY()
+	TMap<UItemData*, int32> ItemInventory;
 	TMap<EAmmoType, int32> AmmoInventoryMap;
 
-	TArray<TObjectPtr<UItemData>> SwitchList;
+	UPROPERTY()
+	TArray<UItemData*> SwitchList;
 
 	int32 CurrentItemIndex = 0;
 
