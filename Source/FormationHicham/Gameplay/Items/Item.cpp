@@ -3,6 +3,8 @@
 
 #include "Item.h"
 
+#include "Components/BoxComponent.h"
+
 // Sets default values
 AItem::AItem()
 {

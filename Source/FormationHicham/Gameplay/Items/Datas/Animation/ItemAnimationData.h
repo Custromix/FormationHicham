@@ -28,9 +28,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Offset)
 	FRotator RotationAimOffset;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Offset)
-	float AlphaIK;
+	bool bEnableLeftIK;
 
 	/* Animation Character */
 	
@@ -69,6 +69,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequence* Holster;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
+	UAnimSequence* WallAvoid;
 
 	/* Animation Weapon */
 	

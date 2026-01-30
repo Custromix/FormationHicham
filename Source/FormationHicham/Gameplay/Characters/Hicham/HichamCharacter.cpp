@@ -53,8 +53,6 @@ void AHichamCharacter::BeginPlay()
 	GenericTeamID = static_cast<uint8>(TeamID);
 
 	Inventory->OnItemAdded.AddDynamic(this, &AHichamCharacter::OnItemAdded);
-
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Hello World!");
 }
 
 void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -128,7 +126,6 @@ void AHichamCharacter::Equip(UItemData* CurrentItemData)
 	EquippedItemActor->Initialize(CurrentItemData);
 
 	const bool IsAttach = EquippedItemActor->AttachToComponent(CharacterMesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentItemData->SocketName);
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Is Attach : %hs"), IsAttach ? "true" : "false"));
 	FTransform LHIKTransform = GetItemSocketTransformInMeshSpace("LHIK");
 	OnItemSwitch.Broadcast(LHIKTransform);
 }
@@ -143,15 +140,8 @@ void AHichamCharacter::Aim()
 {
 	if (!EquippedItemActor && !EquippedItemActor->GetItemData()->bIsAimable)
 		return;
-	
-	if (!bIsAiming)
-	{
-		bIsAiming = true;
-	}
-	else
-	{
-		bIsAiming = false;
-	}
+
+	bIsAiming = !bIsAiming;
 
 	
 	

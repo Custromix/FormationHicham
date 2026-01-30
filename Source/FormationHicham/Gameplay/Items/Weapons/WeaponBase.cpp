@@ -46,15 +46,15 @@ void AWeaponBase::Use_Implementation(UCameraComponent* PlayerCamera)
 	FVector End = PlayerCamera->GetForwardVector();
 	
 	FHitResult HitResult;
-	
+	TArray<AActor*> IgnoredActors = {this, GetOwner()};
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActors(IgnoredActors);
 	Params.AddIgnoredActor(GetOwner());
 	
 	bool bHit = GetWorld()->LineTraceSingleByChannel(
 	HitResult,
 	Start,
-	Start + End * 5000.0f,
+	Start + End * WeaponInfoDataAsset->MaxRange,
 	ECC_Visibility
 	);
 	
@@ -72,7 +72,7 @@ void AWeaponBase::Use_Implementation(UCameraComponent* PlayerCamera)
 			HitResult.GetActor()->TakeDamage(WeaponInfoDataAsset->Damage, DamageType, GetInstigatorController(), GetOwner());
 		}
 	}
-	else DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 2.0f);
+	else DrawDebugLine(GetWorld(), Start, End * WeaponInfoDataAsset->MaxRange, FColor::Green, false, 2.0f);
 }
 
 void AWeaponBase::Aim_Implementation()

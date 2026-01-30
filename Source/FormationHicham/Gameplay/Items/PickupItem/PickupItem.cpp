@@ -25,6 +25,13 @@ void APickupItem::Initialize(UItemData* Data)
 	ItemData = Data;
 	ItemMesh->SetSkeletalMesh(ItemData->ItemMesh);
 	ItemMesh->SetSimulatePhysics(true);
+	const int32 MaterialsNum = ItemMesh->GetMaterials().Num();
+	for (int i = 0; i < MaterialsNum; ++i)
+	{
+		UMaterialInstanceDynamic* NewDynamicMaterialInstance = ItemMesh->CreateDynamicMaterialInstance(i, ItemMesh->GetMaterials()[i]);
+		NewDynamicMaterialInstance->SetScalarParameterValue(ClippingParameterName, 0.f);
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "New Material Instance");
+	}
 }
 
 // Called when the game starts or when spawned

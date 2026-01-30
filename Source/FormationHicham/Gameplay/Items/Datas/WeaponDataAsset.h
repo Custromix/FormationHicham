@@ -37,6 +37,9 @@ public:
 	float Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MaxRange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EDamageType DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

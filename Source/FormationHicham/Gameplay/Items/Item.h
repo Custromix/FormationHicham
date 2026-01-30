@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SphereComponent.h"
 #include "Datas/ItemData.h"
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
 enum class EItemType : uint8;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWallCollideOrUncollide, bool, bIsCollide);
 
 UCLASS(Abstract)
 class FORMATIONHICHAM_API AItem : public AActor
@@ -56,4 +59,8 @@ protected:
 	FName ItemName;
 	
 	EItemType ItemType;
+
+public:
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnWallCollideOrUncollide OnWallCollideOrUncollide;
 };

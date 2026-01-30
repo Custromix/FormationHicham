@@ -38,4 +38,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UItemData> ItemData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	FName ClippingParameterName = FName("EnableRenderOnTop?");
 };

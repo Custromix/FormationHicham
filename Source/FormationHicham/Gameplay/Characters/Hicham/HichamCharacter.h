@@ -13,8 +13,16 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "HichamCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemSwitch, FTransform, LHIKTransform);
+UENUM(BlueprintType, Blueprintable)
+enum class EAvoidanceType : uint8
+{
+	Animation				UMETA(DisplayName = "Animation"),
+	IK						UMETA(DisplayName = "IK"),
+	SceneComponent2D		UMETA(DisplayName = "Scene Component 2D"),
+	MaterialWorldOffset		UMETA(DisplayName = "Material World offset")
+};
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemSwitch, FTransform, LHIKTransform);
 UCLASS()
 class FORMATIONHICHAM_API AHichamCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
@@ -92,6 +100,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AI")
 	float DroppingForce = 1500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Settings")
+	EAvoidanceType AvoidanceType = EAvoidanceType::Animation;
+	
 	
 	#pragma region Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
