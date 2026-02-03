@@ -16,18 +16,16 @@ AHichamCharacter::AHichamCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	Pivot = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
-	Pivot->SetupAttachment(GetCapsuleComponent());
-
+	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Boom"));
-	SpringArm->SetupAttachment(Pivot);
+	SpringArm->SetupAttachment(GetCapsuleComponent());
 	
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera World"));
 	Camera->SetupAttachment(SpringArm);
+	Camera->bUsePawnControlRotation = true;
 	
-	CharacterMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
-	CharacterMesh1P->SetupAttachment(Pivot);
+	CharacterMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Character Mesh"));
+	CharacterMesh1P->SetupAttachment(Camera);
 	
 	DropItemLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Drop Item Start"));
 	DropItemLocation->SetupAttachment(Camera);
@@ -226,5 +224,5 @@ FTransform AHichamCharacter::GetItemSocketTransformInMeshSpace(const FName Socke
 void AHichamCharacter::Tick(float DeltaTime)
 {
 	//Super::Tick(DeltaTime);
-	Pivot->SetRelativeRotation(FRotator(GetControlRotation().Pitch, 0, 0));
+	//Pivot->SetRelativeRotation(FRotator(GetControlRotation().Pitch, 0, 0));
 }

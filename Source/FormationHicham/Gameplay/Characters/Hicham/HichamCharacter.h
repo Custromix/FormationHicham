@@ -71,9 +71,6 @@ private:
 	
 protected:
 	/* Player Stuff */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Global")
-	USceneComponent* Pivot;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Mesh)
 	USkeletalMeshComponent* CharacterMesh1P;
 	

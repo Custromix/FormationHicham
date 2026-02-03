@@ -18,6 +18,9 @@ void AItem::Initialize(UItemData* AItemData)
 	
 	ItemMesh->SetSkeletalMesh(ItemData->ItemMesh);
 	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	//ItemMesh->GetSkeletalMeshAsset()->
+	//ItemMesh->SetOnlyOwnerSee(true);
 }
 
 void AItem::BeginPlay()
