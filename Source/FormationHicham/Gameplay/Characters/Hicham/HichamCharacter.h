@@ -19,7 +19,8 @@ enum class EAvoidanceType : uint8
 	Animation				UMETA(DisplayName = "Animation"),
 	IK						UMETA(DisplayName = "IK"),
 	SceneComponent2D		UMETA(DisplayName = "Scene Component 2D"),
-	MaterialWorldOffset		UMETA(DisplayName = "Material World offset")
+	MaterialWorldOffset		UMETA(DisplayName = "Material World offset"),
+	UE5_5			 		UMETA(DisplayName = "Unreal Engine E5.5")
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemSwitch, FTransform, LHIKTransform);
