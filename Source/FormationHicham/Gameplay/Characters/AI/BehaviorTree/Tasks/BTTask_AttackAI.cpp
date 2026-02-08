@@ -17,7 +17,6 @@ EBTNodeResult::Type UBTTask_AttackAI::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	
 	if (TrumpGuard)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Attaque");
 		TrumpGuard->StartMontage();
 		TrumpGuard->OnAttackFinished.AddDynamic(this, &UBTTask_AttackAI::OnAttackFinished);
 		return EBTNodeResult::InProgress;
@@ -38,7 +37,6 @@ EBTNodeResult::Type UBTTask_AttackAI::AbortTask(UBehaviorTreeComponent& OwnerCom
 
 void UBTTask_AttackAI::OnAttackFinished()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Attaque FINI");
 
 	if (!CachedOwnerComponent)
 		return;

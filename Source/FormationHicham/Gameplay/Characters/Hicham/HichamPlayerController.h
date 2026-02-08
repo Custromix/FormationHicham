@@ -14,11 +14,11 @@ UCLASS()
 class FORMATIONHICHAM_API AHichamPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+	
+protected:
+	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(EditAnywhere, Blueprintable, Category = Input)
 	UInputMappingContext* InputMappingContext;
-
-protected:
-	virtual void BeginPlay() override;
 };

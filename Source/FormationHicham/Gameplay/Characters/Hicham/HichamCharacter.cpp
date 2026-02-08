@@ -7,12 +7,16 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
+#include "FormationHicham/Gameplay/CommonComponents/CharacterMovementComponent/PlayerCharacterMovementComponent.h"
 #include "FormationHicham/Gameplay/Items/Melee/Melee.h"
 #include "FormationHicham/Gameplay/Items/PickupItem/PickupItem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
-AHichamCharacter::AHichamCharacter()
+
+AHichamCharacter::AHichamCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerCharacterMovementComponent>(
+		ACharacter::CharacterMovementComponentName))
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -36,6 +40,12 @@ AHichamCharacter::AHichamCharacter()
 	bUseControllerRotationYaw = true;
 }
 
+void AHichamCharacter::OnConstruction(const FTransform& Transform)
+{
+	SpringArm->SetRelativeLocation(FVector(0, 0, BaseEyeHeight));
+	Super::OnConstruction(Transform);
+}
+
 bool AHichamCharacter::TryPickupItem(UItemData* Item)
 {
 	if (!Item)
@@ -51,6 +61,8 @@ void AHichamCharacter::BeginPlay()
 	GenericTeamID = static_cast<uint8>(TeamID);
 
 	Inventory->OnItemAdded.AddDynamic(this, &AHichamCharacter::OnItemAdded);
+	StandedEyeHeight = SpringArm->GetComponentLocation().Z;
+	CurrentEyeHeight = SpringArm->GetRelativeLocation().Z;
 }
 
 void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -58,6 +70,7 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (UEnhancedInputComponent* EnhancedPlayerInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedPlayerInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AHichamCharacter::Jump);
+		
 		EnhancedPlayerInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AHichamCharacter::StopJumping);
 		
 		EnhancedPlayerInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHichamCharacter::Move);
@@ -75,6 +88,10 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedPlayerInputComponent->BindAction(NextItemAction, ETriggerEvent::Started, this, &AHichamCharacter::NextItem);
 		
 		EnhancedPlayerInputComponent->BindAction(PreviousItemAction, ETriggerEvent::Started, this, &AHichamCharacter::PreviousItem);
+		
+		EnhancedPlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Ongoing, this, &AHichamCharacter::StartCrouch);
+		
+		EnhancedPlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AHichamCharacter::StopCrouch);
 	}
 }
 
@@ -87,6 +104,24 @@ void AHichamCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorForwardVector(), Movement.X);
 		AddMovementInput(GetActorRightVector(), Movement.Y);
 	}
+}
+
+bool AHichamCharacter::CanJumpInternal_Implementation() const
+{
+	//return Super::CanJumpInternal_Implementation();
+	return JumpIsAllowedInternal();
+}
+
+void AHichamCharacter::StartCrouch()
+{
+	if (!GetCharacterMovement()->IsFalling())
+		Crouch();
+}
+
+void AHichamCharacter::StopCrouch()
+{
+	if (GetCharacterMovement()->IsCrouching())
+		UnCrouch();
 }
 
 void AHichamCharacter::Look(const FInputActionValue& Value)
@@ -140,12 +175,6 @@ void AHichamCharacter::Aim()
 		return;
 
 	bIsAiming = !bIsAiming;
-
-	
-	
-	//if (!EquippedItemActor || EquippedItemActor->Implements<UAimableInterface>())
-	
-	//IAimableInterface::Execute_Aim(EquippedItemActor);
 }
 
 void AHichamCharacter::Reload()
@@ -162,7 +191,7 @@ void AHichamCharacter::DropItem()
 	if (!EquippedItemActor->GetItemData()->bIsDroppable)
 		return;
 
-	/* Span Item Physically */
+	/* Spawn PickupItem */
 	FActorSpawnParameters Params;
 	Params.Owner = this;
 	
@@ -170,7 +199,7 @@ void AHichamCharacter::DropItem()
 	DroppedActor->Initialize(EquippedItemActor->GetItemData());
 	DroppedActor->SetActorLocation(DropItemLocation->GetComponentLocation(), false, nullptr, ETeleportType::TeleportPhysics);
 
-	/* Drop Item */
+	/* Drop PickupItem */
 	FVector CameraForwardVector = Camera->GetForwardVector();
 	CameraForwardVector.Normalize();
 	
@@ -206,6 +235,53 @@ void AHichamCharacter::PreviousItem()
 		Equip(NewItemData);
 }
 
+void AHichamCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	CurrentEyeHeight = CurrentEyeHeight + HalfHeightAdjust;
+	bIsCrouchInterpolating = true;
+	CrouchAlpha = 0.f;
+	
+	CrouchWorldZ = BaseEyeHeight + SpringArm->GetAttachParent()->GetComponentLocation().Z;
+}
+
+void AHichamCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	CurrentEyeHeight = CurrentEyeHeight - HalfHeightAdjust;
+	bIsCrouchInterpolating = true;
+	CrouchAlpha = 0.f;
+}
+
+void AHichamCharacter::Crouch(bool bClientSimulation)
+{
+	Super::Crouch(bClientSimulation);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Crouch 2");
+
+}
+
+void AHichamCharacter::InterpCrouch(float DeltaTime)
+{
+	if (!bIsCrouchInterpolating)
+		return;
+	
+	CrouchAlpha += DeltaTime / CrouchDurationS;
+	CrouchAlpha = FMath::Clamp(CrouchAlpha, 0.f, 1.f);
+	
+	float TargetHeight = GetCharacterMovement()->bWantsToCrouch ? BaseEyeHeight + CrouchedEyeHeight: BaseEyeHeight;
+	CurrentEyeHeight = FMath::Lerp(CurrentEyeHeight, TargetHeight, CrouchAlpha);
+	
+	FVector NewVector = FVector(SpringArm->GetRelativeLocation().X, SpringArm->GetRelativeLocation().Y, CurrentEyeHeight);
+
+	SpringArm->SetRelativeLocation(NewVector);
+	
+	if (CrouchAlpha >= 1.f)
+	{
+		bIsCrouchInterpolating = false;
+		bIsCrouched = false;
+	}
+}
+
 FTransform AHichamCharacter::GetItemSocketTransformInMeshSpace(const FName SocketName)
 {
 	if (!EquippedItemActor || !CharacterMesh1P)
@@ -223,6 +299,8 @@ FTransform AHichamCharacter::GetItemSocketTransformInMeshSpace(const FName Socke
 // Called every frame
 void AHichamCharacter::Tick(float DeltaTime)
 {
-	//Super::Tick(DeltaTime);
-	//Pivot->SetRelativeRotation(FRotator(GetControlRotation().Pitch, 0, 0));
+	Super::Tick(DeltaTime);
+	
+	if (bIsCrouchInterpolating)
+		InterpCrouch(DeltaTime);
 }

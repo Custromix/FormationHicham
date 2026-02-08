@@ -30,7 +30,6 @@ void APickupItem::Initialize(UItemData* Data)
 	{
 		UMaterialInstanceDynamic* NewDynamicMaterialInstance = ItemMesh->CreateDynamicMaterialInstance(i, ItemMesh->GetMaterials()[i]);
 		NewDynamicMaterialInstance->SetScalarParameterValue(ClippingParameterName, 0.f);
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "New Material Instance");
 	}
 }
 

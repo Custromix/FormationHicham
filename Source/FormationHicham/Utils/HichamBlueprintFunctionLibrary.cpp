@@ -10,8 +10,6 @@ bool UHichamBlueprintFunctionLibrary::SetStaticSwitchParameterValue(UMaterialIns
 	UMaterialInstanceConstant* MIC = Cast<UMaterialInstanceConstant>(Instance);
 	if (!MIC)
 		return false;
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, "SetStaticSwitchParameterValue CACA");
 	
 	FStaticParameterSet StaticParams = MIC->GetStaticParameters();
 
@@ -30,7 +28,6 @@ bool UHichamBlueprintFunctionLibrary::SetStaticSwitchParameterValue(UMaterialIns
 
 	if (!bFound)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, "gzgzgzzgzggzgz CACA");
 		return false;
 	}
 

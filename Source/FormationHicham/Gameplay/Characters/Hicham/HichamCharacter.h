@@ -31,20 +31,34 @@ class FORMATIONHICHAM_API AHichamCharacter : public ACharacter, public IGenericT
 
 public:
 	// Sets default values for this character's properties
-	AHichamCharacter();
+	AHichamCharacter(const FObjectInitializer& ObjectInitializer);
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
-	// Called when the game starts or when spawned
+	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	void Move(const FInputActionValue& Value);
+	/** Look */
 	void Look(const FInputActionValue& Value);
-
-	UFUNCTION()
-	void OnItemAdded(UItemData* CurrentItemData);
 	
+	/** Move */
+	void Move(const FInputActionValue& Value);
+
+	/** Jump */
+	virtual bool CanJumpInternal_Implementation() const override;
+
+	/** Crouch */
+	void StartCrouch();
+	void StopCrouch();
+	
+	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void Crouch(bool bClientSimulation = false) override;
+	void InterpCrouch(float DeltaTime);
+
+	/** Inventory */
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void Equip(UItemData* CurrentItemData);
 	void FirstUse();
@@ -53,12 +67,15 @@ protected:
 	void DropItem();
 	void NextItem();
 	void PreviousItem();
-
+	
+	UFUNCTION()
+	void OnItemAdded(UItemData* CurrentItemData);
+	
 	UFUNCTION(BlueprintCallable, Category="Animation")
 	FTransform GetItemSocketTransformInMeshSpace(const FName SocketName);
 
 public:
-	// Called every frame
+	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
@@ -70,8 +87,12 @@ private:
 	UPROPERTY()
 	FGenericTeamId GenericTeamID;
 	
+	float CrouchWorldZ;
+	float CurrentEyeHeight;
+	float StandingEyeHeight;
+	
 protected:
-	/* Player Stuff */
+	/* Character Settings */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Mesh)
 	USkeletalMeshComponent* CharacterMesh1P;
 	
@@ -92,7 +113,23 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Gameplay)
 	USceneComponent* DropItemLocation;
+
 	
+	/* Crouch Settings */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
+	float StandedEyeHeight;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
+	float CrouchDurationS = 2.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
+	float CrouchAlpha = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
+	bool bIsCrouchInterpolating = false;
+
+	
+	/* Other Settings */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AI")
 	ETeamType TeamID = ETeamType::Player;
 
@@ -101,7 +138,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Settings")
 	EAvoidanceType AvoidanceType = EAvoidanceType::Animation;
-	
+
 	
 	#pragma region Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
@@ -130,6 +167,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* PreviousItemAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
+	UInputAction* CrouchAction;
 	#pragma endregion
 
 public:
