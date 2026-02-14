@@ -10,6 +10,7 @@
 #include "FormationHicham/Gameplay/CommonComponents/HealthComponent/HealthComponent.h"
 #include "FormationHicham/Gameplay/CommonComponents/InventoryComponent/InventoryPlayerSystemComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HichamCharacter.generated.h"
 
@@ -40,22 +41,29 @@ protected:
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	/** Camera */
+	void SetupAndStartFovTransition(float NewFOV, float InterpTimeS);
+	
+	UFUNCTION(BlueprintImplementableEvent, Category="Camera")
+	void InterpFOV(UCurveFloat* FOVCurve);
+	
 	/** Look */
 	void Look(const FInputActionValue& Value);
 	
 	/** Move */
 	void Move(const FInputActionValue& Value);
+	void OnSprint();
+	void StopSprint();
 
 	/** Jump */
 	virtual bool CanJumpInternal_Implementation() const override;
 
 	/** Crouch */
-	void StartCrouch();
+	void OnCrouch();
 	void StopCrouch();
-	
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
-	virtual void Crouch(bool bClientSimulation = false) override;
+	
 	void InterpCrouch(float DeltaTime);
 
 	/** Inventory */
@@ -86,13 +94,11 @@ public:
 private:
 	UPROPERTY()
 	FGenericTeamId GenericTeamID;
-	
-	float CrouchWorldZ;
+
 	float CurrentEyeHeight;
-	float StandingEyeHeight;
 	
 protected:
-	/* Character Settings */
+	/** Character Settings */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Mesh)
 	USkeletalMeshComponent* CharacterMesh1P;
 	
@@ -114,22 +120,47 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Gameplay)
 	USceneComponent* DropItemLocation;
 
+	/** Camera Settings */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Camera)
+	float FOV = 100;
 	
-	/* Crouch Settings */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
-	float StandedEyeHeight;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Camera)
+	float SprintFOV = 120;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Camera)
+	float InterpFOVTimeS = 0.3;
 	
+	UPROPERTY()
+	UCurveFloat* RuntimeFOVCurve;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=FIRE)
+	bool bIsAiming = false;
+	
+	/** Movement */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=CharacterMovement)
+	float WalkSpeed = 450.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=CharacterMovement)
+	float SprintSpeed = 600.f;
+	
+	/** Crouch Settings */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
 	float CrouchDurationS = 2.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
+	UPROPERTY(BlueprintReadOnly, Category=Crouch)
 	float CrouchAlpha = 1.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Crouch)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Crouch)
 	bool bIsCrouchInterpolating = false;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Hicham Movement")
+	bool bIsSprinting = false;
 	
-	/* Other Settings */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Hicham Movement")
+	bool bIsFalling = false;
+
+	
+	/** Other Settings */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AI")
 	ETeamType TeamID = ETeamType::Player;
 
@@ -167,14 +198,15 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* PreviousItemAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
+	UInputAction* SprintAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input)
 	UInputAction* CrouchAction;
 	#pragma endregion
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bIsAiming = false;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnItemSwitch OnItemSwitch;

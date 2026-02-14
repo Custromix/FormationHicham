@@ -43,6 +43,9 @@ AHichamCharacter::AHichamCharacter(const FObjectInitializer& ObjectInitializer)
 void AHichamCharacter::OnConstruction(const FTransform& Transform)
 {
 	SpringArm->SetRelativeLocation(FVector(0, 0, BaseEyeHeight));
+	Camera->FieldOfView = FOV;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	
 	Super::OnConstruction(Transform);
 }
 
@@ -61,7 +64,6 @@ void AHichamCharacter::BeginPlay()
 	GenericTeamID = static_cast<uint8>(TeamID);
 
 	Inventory->OnItemAdded.AddDynamic(this, &AHichamCharacter::OnItemAdded);
-	StandedEyeHeight = SpringArm->GetComponentLocation().Z;
 	CurrentEyeHeight = SpringArm->GetRelativeLocation().Z;
 }
 
@@ -69,11 +71,19 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	if (UEnhancedInputComponent* EnhancedPlayerInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		EnhancedPlayerInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHichamCharacter::Move);
+		
+		EnhancedPlayerInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AHichamCharacter::OnSprint);
+		
+		EnhancedPlayerInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AHichamCharacter::StopSprint);
+		
 		EnhancedPlayerInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AHichamCharacter::Jump);
 		
 		EnhancedPlayerInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AHichamCharacter::StopJumping);
 		
-		EnhancedPlayerInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHichamCharacter::Move);
+		EnhancedPlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Ongoing, this, &AHichamCharacter::OnCrouch);
+		
+		EnhancedPlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AHichamCharacter::StopCrouch);
 
 		EnhancedPlayerInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AHichamCharacter::Look);
 		
@@ -88,11 +98,28 @@ void AHichamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedPlayerInputComponent->BindAction(NextItemAction, ETriggerEvent::Started, this, &AHichamCharacter::NextItem);
 		
 		EnhancedPlayerInputComponent->BindAction(PreviousItemAction, ETriggerEvent::Started, this, &AHichamCharacter::PreviousItem);
-		
-		EnhancedPlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Ongoing, this, &AHichamCharacter::StartCrouch);
-		
-		EnhancedPlayerInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AHichamCharacter::StopCrouch);
 	}
+}
+
+void AHichamCharacter::SetupAndStartFovTransition(float NewFOV, float InterpTimeS)
+{
+	if (!RuntimeFOVCurve)
+		RuntimeFOVCurve = NewObject<UCurveFloat>(this, TEXT("Runtime FOV Curve"));
+	
+	FRichCurve& RichCurve = RuntimeFOVCurve->FloatCurve;
+	RichCurve.Reset();
+	
+	const FKeyHandle K0 = RichCurve.AddKey(0, Camera->FieldOfView);
+	const FKeyHandle K1 = RichCurve.AddKey(InterpTimeS, NewFOV);
+
+	RichCurve.SetKeyInterpMode(K0, RCIM_Cubic);
+	RichCurve.SetKeyInterpMode(K1, RCIM_Cubic);
+
+	// Tangents auto (optionnel mais souvent souhaité)
+	RichCurve.SetKeyTangentMode(K0, RCTM_Auto);
+	RichCurve.SetKeyTangentMode(K1, RCTM_Auto);
+	
+	InterpFOV(RuntimeFOVCurve);
 }
 
 void AHichamCharacter::Move(const FInputActionValue& Value)
@@ -106,13 +133,32 @@ void AHichamCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
+void AHichamCharacter::OnSprint()
+{
+	if (IsCrouched() || GetCharacterMovement()->IsFalling() || GetCharacterMovement()->Velocity.Length() <= 0)
+		return;
+	
+	SetupAndStartFovTransition(SprintFOV, InterpFOVTimeS);
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	bIsAiming = false;
+	bIsSprinting = true;
+}
+
+void AHichamCharacter::StopSprint()
+{
+	if (!bIsSprinting)
+		return;
+	SetupAndStartFovTransition(FOV, InterpFOVTimeS);
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	bIsSprinting = false;
+}
+
 bool AHichamCharacter::CanJumpInternal_Implementation() const
 {
-	//return Super::CanJumpInternal_Implementation();
 	return JumpIsAllowedInternal();
 }
 
-void AHichamCharacter::StartCrouch()
+void AHichamCharacter::OnCrouch()
 {
 	if (!GetCharacterMovement()->IsFalling())
 		Crouch();
@@ -165,13 +211,16 @@ void AHichamCharacter::Equip(UItemData* CurrentItemData)
 
 void AHichamCharacter::FirstUse()
 {
+	if (bIsSprinting)
+		return;
+	
 	if (EquippedItemActor && EquippedItemActor->Implements<UUsuableInterface>())
 		IUsuableInterface::Execute_Use(EquippedItemActor, Camera);
 }
 
 void AHichamCharacter::Aim()
 {
-	if (!EquippedItemActor && !EquippedItemActor->GetItemData()->bIsAimable)
+	if (!EquippedItemActor || !EquippedItemActor->GetItemData()->bIsAimable || bIsSprinting)
 		return;
 
 	bIsAiming = !bIsAiming;
@@ -239,10 +288,9 @@ void AHichamCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHei
 {
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 	CurrentEyeHeight = CurrentEyeHeight + HalfHeightAdjust;
+	//FMath::FInterpTo()
 	bIsCrouchInterpolating = true;
 	CrouchAlpha = 0.f;
-	
-	CrouchWorldZ = BaseEyeHeight + SpringArm->GetAttachParent()->GetComponentLocation().Z;
 }
 
 void AHichamCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
@@ -251,13 +299,6 @@ void AHichamCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeigh
 	CurrentEyeHeight = CurrentEyeHeight - HalfHeightAdjust;
 	bIsCrouchInterpolating = true;
 	CrouchAlpha = 0.f;
-}
-
-void AHichamCharacter::Crouch(bool bClientSimulation)
-{
-	Super::Crouch(bClientSimulation);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Crouch 2");
-
 }
 
 void AHichamCharacter::InterpCrouch(float DeltaTime)
@@ -300,7 +341,11 @@ FTransform AHichamCharacter::GetItemSocketTransformInMeshSpace(const FName Socke
 void AHichamCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	bIsFalling = GetCharacterMovement()->IsFalling();
 	
+	GEngine->AddOnScreenDebugMessage(98,5.f,FColor::Blue,FString::Printf(TEXT("Flying Component => %s"), GetCharacterMovement()->IsFlying() ? TEXT("true") : TEXT("false")));
 	if (bIsCrouchInterpolating)
 		InterpCrouch(DeltaTime);
+	
 }
