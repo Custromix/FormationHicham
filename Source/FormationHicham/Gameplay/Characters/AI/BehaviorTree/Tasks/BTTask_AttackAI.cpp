@@ -3,6 +3,7 @@
 
 #include "BTTask_AttackAI.h"
 
+#include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_AttackAI::UBTTask_AttackAI()
@@ -10,43 +11,48 @@ UBTTask_AttackAI::UBTTask_AttackAI()
 	
 }
 
-EBTNodeResult::Type UBTTask_AttackAI::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_AttackAI::ExecuteTask(UBehaviorTreeComponent& OwnerComponent, uint8* NodeMemory)
 {
-	CachedOwnerComponent = &OwnerComp;
-	TrumpGuard = Cast<ATrumpGuardBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("SelfActor"));
+	FBTAttackTaskMemory* Memory = reinterpret_cast<FBTAttackTaskMemory*>(NodeMemory);
 	
-	if (TrumpGuard)
-	{
-		TrumpGuard->StartMontage();
-		TrumpGuard->OnAttackFinished.AddDynamic(this, &UBTTask_AttackAI::OnAttackFinished);
-		return EBTNodeResult::InProgress;
-	}else
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, "ATTACK IA");
+	Memory->TrumpGuard = Cast<ATrumpGuardBase>(OwnerComponent.GetBlackboardComponent()->GetValueAsObject("SelfActor"));
+
+	if (!Memory->TrumpGuard)
 		return EBTNodeResult::Failed;
+	
+	Memory->TrumpGuard->StartAttack();
+	Memory->TrumpGuard->OnAttackFinished.AddDynamic(this, &UBTTask_AttackAI::OnAttackFinished);
+	return EBTNodeResult::InProgress;
 }
 
-EBTNodeResult::Type UBTTask_AttackAI::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTTask_AttackAI::AbortTask(UBehaviorTreeComponent& OwnerComponent, uint8* NodeMemory)
 {
-	if (TrumpGuard)
+	FBTAttackTaskMemory* Memory = reinterpret_cast<FBTAttackTaskMemory*>(NodeMemory);
+	
+	if (Memory->TrumpGuard)
 	{
-		//TrumpGuard->StopMontage();
-		TrumpGuard->OnAttackFinished.RemoveDynamic(this,&UBTTask_AttackAI::OnAttackFinished);
+		Memory->TrumpGuard->OnAttackFinished.RemoveDynamic(this,&UBTTask_AttackAI::OnAttackFinished);
 	}
 	
-	return Super::AbortTask(OwnerComp, NodeMemory);
+	return Super::AbortTask(OwnerComponent, NodeMemory);
 }
 
-void UBTTask_AttackAI::OnAttackFinished()
+void UBTTask_AttackAI::OnAttackFinished(ATrumpGuardBase* Attacker)
 {
+	if (!Attacker)
+		return;
 
-	if (!CachedOwnerComponent)
+	AAIController* AttackerController = Cast<AAIController>(Attacker->GetController());
+	if (!AttackerController)
+		return;
+
+	UBehaviorTreeComponent* AttackerBehaviorTreeComponent = Cast<UBehaviorTreeComponent>(AttackerController->GetBrainComponent());
+	if (!AttackerBehaviorTreeComponent)
 		return;
 	
-	if (!TrumpGuard)
-		return;
-
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Attaque FINI");
-
-	//TrumpGuard->StopMontage();
-	TrumpGuard->OnAttackFinished.RemoveDynamic(this,&UBTTask_AttackAI::OnAttackFinished);
-	FinishLatentTask(*CachedOwnerComponent, EBTNodeResult::Succeeded);
+	
+	Attacker->OnAttackFinished.RemoveDynamic(this,&UBTTask_AttackAI::OnAttackFinished);
+	FinishLatentTask(*AttackerBehaviorTreeComponent, EBTNodeResult::Succeeded);
 }

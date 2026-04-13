@@ -47,10 +47,10 @@ public:
 	UAnimSequence* IdleAimLoop;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
-	UAnimSequence* Fire;
+	UAnimMontage* Fire;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
-	UAnimSequence* FireAim;
+	UAnimMontage* SecondaryFire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequence* Walk;
@@ -62,13 +62,13 @@ public:
 	UAnimSequence* Run;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
-	UAnimSequence* Reload;
+	UAnimMontage* Reload;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequence* Equip;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
-	UAnimSequence* Holster;
+	UAnimMontage* Holster;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimSequence* WallAvoid;

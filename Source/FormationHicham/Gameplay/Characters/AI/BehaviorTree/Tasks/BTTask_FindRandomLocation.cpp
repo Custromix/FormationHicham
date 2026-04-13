@@ -3,9 +3,9 @@
 
 #include "BTTask_FindRandomLocation.h"
 
-#include "NavigationPath.h"
 #include "NavigationSystem.h"
-#include "FormationHicham/Gameplay/Characters/AI/Enemy/TrumpGuardAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/Controller/TrumpGuardAIControllerBase.h"
 
 UBTTask_FindRandomLocation::UBTTask_FindRandomLocation()
 {
@@ -15,7 +15,7 @@ UBTTask_FindRandomLocation::UBTTask_FindRandomLocation()
 EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 
-	if (const ATrumpGuardAIController* OwnerAIController = Cast<ATrumpGuardAIController>(OwnerComp.GetAIOwner()))
+	if (const ATrumpGuardAIControllerBase* OwnerAIController = Cast<ATrumpGuardAIControllerBase>(OwnerComp.GetAIOwner()))
 	{
 		if (const APawn* Npc = OwnerAIController->GetPawn())
 		{

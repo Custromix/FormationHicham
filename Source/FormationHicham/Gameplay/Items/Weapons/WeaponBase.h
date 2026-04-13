@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 #include "FormationHicham/Gameplay/Items/Item.h"
 #include "FormationHicham/Gameplay/Items/Datas/WeaponDataAsset.h"
-#include "FormationHicham/Gameplay/Items/Interfaces/AimableInterface.h"
+#include "FormationHicham/Gameplay/Items/Interfaces/FireInterface.h"
 #include "FormationHicham/Gameplay/Items/Interfaces/ReloadableInterface.h"
-#include "FormationHicham/Gameplay/Items/Interfaces/UsuableInterface.h"
+#include "FormationHicham/Gameplay/Items/Interfaces/SecondaryFireInterface.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
 
 UCLASS()
-class FORMATIONHICHAM_API AWeaponBase : public AItem, public IUsuableInterface, public IAimableInterface, public IReloadableInterface
+class FORMATIONHICHAM_API AWeaponBase : public AItem, public IFireInterface, public ISecondaryFireInterface, public IReloadableInterface
 {
 	GENERATED_BODY()
 
@@ -22,6 +22,18 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	UFUNCTION(Category="Weapon")
+	virtual void Fire(FVector Start, FVector End);
+	
+	UFUNCTION(Category="Weapon")
+	virtual bool TryFire_Implementation(const FVector Location, const FVector ForwardVector) override;
+	
+	UFUNCTION(Category="Weapon")
+	virtual bool TrySecondaryFire_Implementation() override;
+	
+	UFUNCTION(Category="Weapon")
+	virtual bool TryReload_Implementation() override;
 
 public:
 	// Called every frame
@@ -30,16 +42,10 @@ public:
 	TObjectPtr<UWeaponDataAsset> GetDataInfo() { return WeaponInfoDataAsset; }
 	
 	UFUNCTION(Category="Weapon")
-	virtual void Fire(FVector Start, FVector End);
+	bool CanReload();
 
-	UFUNCTION(Category="Weapon")
-	virtual void Use_Implementation(UCameraComponent* PlayerCamera) override;
-	
-	UFUNCTION(Category="Weapon")
-	virtual void Aim_Implementation() override;
-	
-	UFUNCTION(Category="Weapon")
-	virtual void Reload_Implementation() override;
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void Reload();
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerHandleFire(FVector ViewportSize);
@@ -64,4 +70,8 @@ protected:
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimMontage* FireAnimation;
+	
+	bool bCanFire = true;
+	float FireRateSeconds;
+	float LastTimeAfterFire;
 };

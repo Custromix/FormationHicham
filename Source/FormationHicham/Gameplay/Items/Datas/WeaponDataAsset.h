@@ -28,16 +28,22 @@ public:
 	EAmmoType AmmoType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 AmmoMax;
+	int32 MagazineCapacity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 CurrentAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 RemainingAmmo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxRange;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float FireRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EDamageType DamageType;

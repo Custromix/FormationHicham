@@ -4,13 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "FormationHicham/Gameplay/Characters/AI/Enemy/TrumpGuardBase.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/TrumpGuardBase.h"
 #include "BTTask_AttackAI.generated.h"
+
+struct FBTAttackTaskMemory
+{
+	ATrumpGuardBase* TrumpGuard;
+};
 
 /**
  * 
  */
-
 UCLASS()
 class FORMATIONHICHAM_API UBTTask_AttackAI : public UBTTask_BlackboardBase
 {
@@ -19,16 +23,13 @@ class FORMATIONHICHAM_API UBTTask_AttackAI : public UBTTask_BlackboardBase
 public:
 	UBTTask_AttackAI();
 	
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComponent, uint8* NodeMemory) override;
 	
-	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComponent, uint8* NodeMemory) override;
 
 	UFUNCTION()
-	void OnAttackFinished();
+	void OnAttackFinished(ATrumpGuardBase* Attacker);
 
-private:
-	UPROPERTY()
-	UBehaviorTreeComponent* CachedOwnerComponent;
-
-	ATrumpGuardBase* TrumpGuard;
+protected:
+	virtual uint16 GetInstanceMemorySize() const override { return sizeof(FBTAttackTaskMemory); }
 };

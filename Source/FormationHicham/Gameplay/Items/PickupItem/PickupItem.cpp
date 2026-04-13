@@ -3,7 +3,7 @@
 
 #include "PickupItem.h"
 
-#include "FormationHicham/Gameplay/Characters/Hicham/HichamCharacter.h"
+#include "FormationHicham/Gameplay/Characters/Player/Hicham/HichamCharacter.h"
 
 
 // Sets default values
