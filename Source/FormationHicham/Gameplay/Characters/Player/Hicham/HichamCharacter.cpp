@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
+#include "FormationHicham/Core/GameMode/FormationTestGameMode.h"
 #include "FormationHicham/Gameplay/CommonComponents/CharacterMovementComponent/PlayerCharacterMovementComponent.h"
 #include "FormationHicham/Gameplay/Items/Melee/Melee.h"
 #include "FormationHicham/Gameplay/Items/PickupItem/PickupItem.h"
@@ -64,6 +65,8 @@ void AHichamCharacter::BeginPlay()
 	GenericTeamID = static_cast<uint8>(TeamID);
 
 	Inventory->OnItemAdded.AddDynamic(this, &AHichamCharacter::OnItemAdded);
+	HealthComponent->OnDeath.AddDynamic(this, &AHichamCharacter::OnDeath);
+	
 	CurrentEyeHeight = SpringArm->GetRelativeLocation().Z;
 }
 
@@ -227,10 +230,8 @@ void AHichamCharacter::Fire()
 		return;
 	if (!EquippedItemActor->Implements<UFireInterface>())
 		return;
-	
-	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "FFJKEKEKKE");
 
-	if (IFireInterface::Execute_TryFire(EquippedItemActor, Camera->GetComponentLocation(), Camera->GetForwardVector()))
+	if (IFireInterface::Execute_TryFire(EquippedItemActor, Camera->GetComponentLocation(), Camera->GetForwardVector(), this))
 	{
 		StopSprint();
 		CharacterMesh1P->GetAnimInstance()->Montage_Play(EquippedItemActor->GetItemData()->AnimationData->Fire);
@@ -369,6 +370,13 @@ FTransform AHichamCharacter::GetItemSocketTransformInMeshSpace(const FName Socke
 	CharacterMesh1P->TransformToBoneSpace("hand_r", LHIK.GetLocation(), LHIK.Rotator(), LHIKLocationInMeshSpace, LHIKRotatorInMeshSpace);
 	
 	return FTransform(LHIKRotatorInMeshSpace, LHIKLocationInMeshSpace, FVector::OneVector);
+}
+
+void AHichamCharacter::OnDeath()
+{
+	if (AFormationTestGameMode* GM = Cast<AFormationTestGameMode>(GetWorld()->GetAuthGameMode()))
+		GM->RequestFinishGame();
+	//Destroy();
 }
 
 // Called every frame

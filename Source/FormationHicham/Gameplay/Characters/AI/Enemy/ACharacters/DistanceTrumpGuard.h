@@ -20,6 +20,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	void TryFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Init")
+	void SetEquippedItemActor(AItem* Item) { EquippedItemActor = Item; }
 	
 public:
 	virtual void StartAttack() override;
@@ -27,8 +30,14 @@ public:
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Attack AI/Inventory")
-	AItem* EquippedItemActor;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attack AI/Inventory")
+	UChildActorComponent* WeaponComponent;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attack AI/Inventory")
+	TSubclassOf<AItem> ItemClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Init")
+	UItemData* ItemData;
 	
 	UPROPERTY(EditAnywhere, Category = "Attack AI/Param")
 	float FireInterval_S = 0.1;
@@ -37,6 +46,9 @@ protected:
 	float AttackDuration_S = 2.f;
 	
 private:
+	
+	UPROPERTY()
+	AItem* EquippedItemActor;
 
 	FTimerHandle TimerHandle_Fire;
 	

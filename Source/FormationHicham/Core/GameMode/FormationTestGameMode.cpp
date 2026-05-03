@@ -13,16 +13,29 @@ void AFormationTestGameMode::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AFormationTestGameMode::RequestRestartGame()
+bool AFormationTestGameMode::RequestRestartGame()
 {
-	if (MatchState == MatchState::LeavingMap)
+	if (MatchState == MatchState::LeavingMap){
 		RestartGame();
+		return true;
+	}
+	return false;
 }
 
-void AFormationTestGameMode::RequestFinishGame()
+bool AFormationTestGameMode::RequestFinishGame()
 {
 	if (MatchState == MatchState::InProgress)
+	{
 		FinishGame();
+		return true;
+	}
+	return false;
+}
+
+bool AFormationTestGameMode::RequestFinalBossStart()
+{
+	FinalBossStart();
+	return true;
 }
 
 void AFormationTestGameMode::RestartGame()
@@ -38,11 +51,13 @@ void AFormationTestGameMode::FinishGame()
 
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->SetPause(true);
+	
+	OnFinishGame.Broadcast();
+	SetMatchState(MatchState::LeavingMap);
+	
+}
 
-	AFormationTestHud* HUD = Cast<AFormationTestHud>(PlayerController->GetHUD());
-	if (HUD)
-	{
-		HUD->DisplayEndGameUI();
-		SetMatchState(MatchState::LeavingMap);
-	}
+void AFormationTestGameMode::FinalBossStart()
+{
+	OnFinalBoss.Broadcast();
 }

@@ -87,6 +87,10 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Animation")
 	FTransform GetItemSocketTransformInMeshSpace(const FName SocketName);
 
+	/** Others */
+	UFUNCTION()
+	void OnDeath();
+	
 public:
 	/** Called every frame */
 	virtual void Tick(float DeltaTime) override;

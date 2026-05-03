@@ -22,6 +22,6 @@ class FORMATIONHICHAM_API IFireInterface
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Item Use")
-	bool TryFire(const FVector Location, const FVector ForwardVector);
+	bool TryFire(const FVector Location, const FVector ForwardVector, AActor* IgnoredActor = nullptr);
 
 };

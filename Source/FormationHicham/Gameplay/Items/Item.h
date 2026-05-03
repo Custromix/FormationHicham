@@ -19,6 +19,8 @@ class FORMATIONHICHAM_API AItem : public AActor
 
 public:
 	AItem();
+
+	UFUNCTION(BlueprintCallable, Category = "Init")
 	virtual void Initialize(UItemData* AItemData);
 
 protected:

@@ -9,6 +9,8 @@
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinalBoss);
 UCLASS()
 class FORMATIONHICHAM_API AFormationTestGameMode : public AGameMode
 {
@@ -19,13 +21,24 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Game Settings")
-	void RequestRestartGame();
+	bool RequestRestartGame();
 	
 	UFUNCTION(BlueprintCallable, Category = "Game Settings")
-	void RequestFinishGame();
+	bool RequestFinishGame();
+	
+	UFUNCTION(BlueprintCallable, Category = "Game Settings")
+	bool RequestFinalBossStart();
 	
 private:
 	void RestartGame();
 	void FinishGame();
+	
+	void FinalBossStart();
 
+public:
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnFinishGame OnFinishGame;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnFinalBoss OnFinalBoss;
 };

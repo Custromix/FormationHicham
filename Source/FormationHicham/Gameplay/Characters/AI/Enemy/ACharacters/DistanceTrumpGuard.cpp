@@ -4,6 +4,7 @@
 #include "DistanceTrumpGuard.h"
 
 #include "FormationHicham/Gameplay/Items/Interfaces/FireInterface.h"
+#include "FormationHicham/Gameplay/Items/Weapons/WeaponBase.h"
 
 
 // Sets default values
@@ -16,6 +17,18 @@ ADistanceTrumpGuard::ADistanceTrumpGuard()
 void ADistanceTrumpGuard::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!ItemData) { GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "ItemData Non Set"); return; }
+	if (!ItemClass) { GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "ItemClass Non Set"); return; }
+	
+	WeaponComponent->SetChildActorClass(ItemClass);
+
+	FActorSpawnParameters Params;
+	Params.Owner = this;
+	EquippedItemActor = GetWorld()->SpawnActor<AItem>(ItemData->ItemClass, Params);
+	EquippedItemActor->Initialize(ItemData);
+	EquippedItemActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "S_Weapon");
+	//FTransform LHIKTransform = GetItemSocketTransformInMeshSpace("LHIK");
 }
 
 void ADistanceTrumpGuard::StartAttack()
@@ -43,15 +56,23 @@ void ADistanceTrumpGuard::TryFire()
 {
 	if (!EquippedItemActor)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "EquippedItemActor Non Set");
 		StopAttack();
 		return;
 	}
+	//EquippedItemActor->GetSkeletalMesh()->GetSocketLocation("MuzzleFlash")
+	FVector EyeLocation;
+	FRotator EyeRotation;
+	GetActorEyesViewPoint(EyeLocation, EyeRotation);
 	
-	if (IFireInterface::Execute_TryFire(EquippedItemActor,EquippedItemActor->GetSkeletalMesh()->GetSocketLocation("MuzzleFlash"), GetActorForwardVector()))
+	if (IFireInterface::Execute_TryFire(EquippedItemActor, EyeLocation, EyeRotation.Vector(), this))
 	{
 		StartMontage();
 		return;
 	}else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Execute_TryFire Failed");
+	}
 		return; //Play Empty magazine sound
 }
 

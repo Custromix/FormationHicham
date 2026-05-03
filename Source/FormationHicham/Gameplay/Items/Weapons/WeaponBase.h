@@ -24,10 +24,10 @@ protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION(Category="Weapon")
-	virtual void Fire(FVector Start, FVector End);
+	virtual void Fire(FVector Start, FVector End, AActor* IgnoredActor);
 	
 	UFUNCTION(Category="Weapon")
-	virtual bool TryFire_Implementation(const FVector Location, const FVector ForwardVector) override;
+	virtual bool TryFire_Implementation(const FVector Location, const FVector ForwardVector, AActor* IgnoredActor = nullptr) override;
 	
 	UFUNCTION(Category="Weapon")
 	virtual bool TrySecondaryFire_Implementation() override;
@@ -63,15 +63,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UWeaponDataAsset> WeaponInfoDataAsset;
 	
-	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
-	USoundBase* FireSound;
-	
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	UAnimMontage* FireAnimation;
+	UAnimMontage* FireAnimation = nullptr;
 	
 	bool bCanFire = true;
-	float FireRateSeconds;
-	float LastTimeAfterFire;
+	float FireRateSeconds = 0.f;
+	float LastTimeAfterFire = 0.f;
 };

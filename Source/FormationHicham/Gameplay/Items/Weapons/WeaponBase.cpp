@@ -23,8 +23,6 @@ void AWeaponBase::Initialize(UItemData* AItemData)
 	WeaponInfoDataAsset = Cast<UWeaponDataAsset>(AItemData);
 	if (!WeaponInfoDataAsset)
 		return;
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Purple, WeaponInfoDataAsset->GetName());
 	
 	/* Set 1 magazine to the weapon */
 	WeaponInfoDataAsset->CurrentAmmo = WeaponInfoDataAsset->MagazineCapacity;
@@ -42,49 +40,52 @@ void AWeaponBase::BeginPlay()
 void AWeaponBase::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Green, FString::Printf(TEXT("Current Bullet : %d/%d"), WeaponInfoDataAsset->CurrentAmmo, WeaponInfoDataAsset->RemainingAmmo));
+	if (WeaponInfoDataAsset)
+		GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Green, FString::Printf(TEXT("Current Bullet : %d/%d"), WeaponInfoDataAsset->CurrentAmmo, WeaponInfoDataAsset->RemainingAmmo));
 }
 
-bool AWeaponBase::TryFire_Implementation(const FVector Location, const FVector ForwardVector)
+bool AWeaponBase::TryFire_Implementation(const FVector Location, const FVector ForwardVector, AActor* IgnoredActor)
 {
 	if (!WeaponInfoDataAsset) return false;
 	if (!bCanFire) return false;
-	if (WeaponInfoDataAsset->CurrentAmmo <= 0) return false;
+	if (WeaponInfoDataAsset->CurrentAmmo <= 0){ GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Ammo empty"); return false;}
 	
 	float DeltaFireTime = GetWorld()->GetTime().GetWorldTimeSeconds() - LastTimeAfterFire;
 
 	if (DeltaFireTime >= FireRateSeconds)
 	{
 		GetSkeletalMesh()->PlayAnimation(WeaponInfoDataAsset->AnimationData->WeaponFire, false);
-		Fire(Location, ForwardVector);
+		Fire(Location, ForwardVector, IgnoredActor);
 		LastTimeAfterFire = GetWorld()->GetTime().GetWorldTimeSeconds();
 		return true;
 	}else
-	{
 		return false;
-	}
 }
 
-void AWeaponBase::Fire(FVector Start, FVector End)
+void AWeaponBase::Fire(FVector Start, FVector End, AActor* IgnoredActor)
 {
 	FHitResult HitResult;
-	TArray<AActor*> IgnoredActors = { this, GetOwner() };
+	TArray<AActor*> IgnoredActors = { this, GetOwner(), IgnoredActor };
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActors(IgnoredActors);
-	Params.AddIgnoredActor(GetOwner());
 	
 	bool bHit = GetWorld()->LineTraceSingleByChannel(
 	HitResult,
 	Start,
 	Start + End * WeaponInfoDataAsset->MaxRange,
-	ECC_Visibility
+	ECC_Visibility,
+	Params
 	);
 	
 	if (bHit)
 	{
 		DrawDebugLine(GetWorld(), Start, HitResult.Location, FColor::Red, false, 2.0f);
 
-		FDamageEvent DamageEvent;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Actor hit => %s"), *HitResult.GetActor()->GetName()));
+		
+		if (!HitResult.GetActor())
+			return;
+		
 		if (WeaponInfoDataAsset->DamageType == EDamageType::POINT)
 		{
 			FPointDamageEvent DamageType;
@@ -94,15 +95,12 @@ void AWeaponBase::Fire(FVector Start, FVector End)
 			FRadialDamageEvent DamageType;
 			HitResult.GetActor()->TakeDamage(WeaponInfoDataAsset->Damage, DamageType, GetInstigatorController(), GetOwner());
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, "FIRE");
-
-		WeaponInfoDataAsset->CurrentAmmo--;
-		if (WeaponInfoDataAsset->CurrentAmmo <= 0)
-			bCanFire = false;
-			
 	}
 	else DrawDebugLine(GetWorld(), Start, End * WeaponInfoDataAsset->MaxRange, FColor::Green, false, 2.0f);
-	
+
+	WeaponInfoDataAsset->CurrentAmmo--;
+	if (WeaponInfoDataAsset->CurrentAmmo <= 0)
+		bCanFire = false;
 }
 
 bool AWeaponBase::TrySecondaryFire_Implementation()
@@ -117,11 +115,8 @@ bool AWeaponBase::CanReload()
 
 bool AWeaponBase::TryReload_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Jee appuie");
-	
 	if (!CanReload())
 		return false;
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, "RELOAD OUIIII");
 	bCanFire = false;
 	GetSkeletalMesh()->PlayAnimation(WeaponInfoDataAsset->AnimationData->WeaponReload, false);
 	

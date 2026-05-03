@@ -15,7 +15,6 @@ EBTNodeResult::Type UBTTask_AttackAI::ExecuteTask(UBehaviorTreeComponent& OwnerC
 {
 	FBTAttackTaskMemory* Memory = reinterpret_cast<FBTAttackTaskMemory*>(NodeMemory);
 	
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, "ATTACK IA");
 	Memory->TrumpGuard = Cast<ATrumpGuardBase>(OwnerComponent.GetBlackboardComponent()->GetValueAsObject("SelfActor"));
 
 	if (!Memory->TrumpGuard)

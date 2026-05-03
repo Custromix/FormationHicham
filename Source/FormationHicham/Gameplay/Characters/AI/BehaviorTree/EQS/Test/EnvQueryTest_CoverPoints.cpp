@@ -83,7 +83,7 @@ void UEnvQueryTest_CoverPoints::RunTest(FEnvQueryInstance& QueryInstance) const
 		float MinDist = FLT_MAX;
 		for (const FVector& CoverPoint : CoverPoints)
 		{
-			DrawDebugPoint(World, CoverPoint, 10.f, FColor::Blue, false, 15.f);
+			DrawDebugPoint(World, CoverPoint, 5.f, FColor::Green, false, 15.f);
 
 			const float Dist = FVector::Dist2D(Point, CoverPoint);
 			UE_LOG(LogTemp, Display, TEXT("Dist: %f"), Dist);
