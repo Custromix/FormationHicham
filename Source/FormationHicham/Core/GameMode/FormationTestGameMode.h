@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/TargetPoint.h"
 #include "GameFramework/GameMode.h"
 #include "FormationTestGameMode.generated.h"
 
@@ -30,7 +31,7 @@ public:
 	bool RequestFinalBossStart();
 	
 private:
-	void RestartGame();
+	//void RestartGame();
 	void FinishGame();
 	
 	void FinalBossStart();
@@ -41,4 +42,8 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FOnFinalBoss OnFinalBoss;
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Final Boss")
+	ATargetPoint* FinalBoosPoint;
 };

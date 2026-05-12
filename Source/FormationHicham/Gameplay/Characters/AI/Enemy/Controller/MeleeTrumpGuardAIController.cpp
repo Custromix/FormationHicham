@@ -4,6 +4,7 @@
 #include "MeleeTrumpGuardAIController.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/Interfaces/EnemyInterface.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
 
@@ -30,7 +31,7 @@ void AMeleeTrumpGuardAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIS
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Le joueur est vu");
 		Blackboard->SetValueAsObject("TargetActor", Actor);
 		bIsPlayerSeen = true;
-		TrumpGuardCharacter->WhenPlayerSeen();
+		TrumpGuard->WhenPlayerSeen();
 		Blackboard->SetValueAsBool("HasLineOfSight", true);
 		return;
 	}
@@ -57,7 +58,7 @@ void AMeleeTrumpGuardAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIS
 	{
 		Blackboard->ClearValue("TargetActor");
 		bIsPlayerSeen = false;
-		TrumpGuardCharacter->WhenPlayerUnseen();
+		TrumpGuard->WhenPlayerUnseen();
 		Blackboard->SetValueAsBool("HasLineOfSight", false);
 	}
 }

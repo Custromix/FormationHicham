@@ -4,6 +4,7 @@
 #include "FormationTestGameMode.h"
 
 #include "FormationHicham/Core/HUD/FormationTestHud.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/Boss/Trump.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -38,12 +39,12 @@ bool AFormationTestGameMode::RequestFinalBossStart()
 	return true;
 }
 
-void AFormationTestGameMode::RestartGame()
+/*void AFormationTestGameMode::RestartGame()
 {
 	const FName CurrentLevelName = *GetWorld()->GetName();
 
 	UGameplayStatics::OpenLevel(GetWorld(), CurrentLevelName);
-}
+}*/
 
 void AFormationTestGameMode::FinishGame()
 {
@@ -59,5 +60,18 @@ void AFormationTestGameMode::FinishGame()
 
 void AFormationTestGameMode::FinalBossStart()
 {
+	
+	/*
+	if (!FinalBoosPoint)
+		return;
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	const FTransform SpawnTransform = FinalBoosPoint->GetTransform();
+	
+	GetWorld()->SpawnActor<ATrump>(SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), SpawnParams);
+	*/
+	
 	OnFinalBoss.Broadcast();
 }

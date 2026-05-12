@@ -10,7 +10,6 @@
 #include "FormationHicham/Gameplay/CommonComponents/HealthComponent/HealthComponent.h"
 #include "FormationHicham/Gameplay/CommonComponents/InventoryComponent/InventoryPlayerSystemComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HichamCharacter.generated.h"
 

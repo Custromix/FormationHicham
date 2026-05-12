@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TrumpGuardBase.h"
-#include "Interfaces/MeleeAttackInterface.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/Interfaces/MeleeAttackInterface.h"
 #include "MeleeTrumpGuard.generated.h"
 
 UCLASS()

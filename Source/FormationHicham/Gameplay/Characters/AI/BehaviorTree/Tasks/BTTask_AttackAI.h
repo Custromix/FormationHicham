@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/TrumpGuardBase.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/NPC/TrumpGuardBase.h"
 #include "BTTask_AttackAI.generated.h"
 
 struct FBTAttackTaskMemory

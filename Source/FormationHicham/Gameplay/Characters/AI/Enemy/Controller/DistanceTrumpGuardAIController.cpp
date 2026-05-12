@@ -4,7 +4,7 @@
 #include "DistanceTrumpGuardAIController.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
-#include "EnvironmentQuery/EnvQueryManager.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/Interfaces/EnemyInterface.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
 
@@ -38,7 +38,7 @@ void ADistanceTrumpGuardAIController::OnTargetPerceptionUpdated(AActor* Actor, F
 		Blackboard->SetValueAsBool("bIsOnAlert", true);
 		bIsPlayerSeen = true;
 		
-		TrumpGuardCharacter->WhenPlayerSeen();
+		TrumpGuard->WhenPlayerSeen();
 		SetFocus(Actor);
 		
 		return;
@@ -75,7 +75,7 @@ void ADistanceTrumpGuardAIController::OnForgetTarget(AActor* Player)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "Joueur oublié, retour patrol");
 
 	Blackboard->ClearValue("LastKnownLocation");
-	TrumpGuardCharacter->WhenPlayerUnseen();
+	TrumpGuard->WhenPlayerUnseen();
 }
 
 void ADistanceTrumpGuardAIController::Tick(float DeltaSeconds)

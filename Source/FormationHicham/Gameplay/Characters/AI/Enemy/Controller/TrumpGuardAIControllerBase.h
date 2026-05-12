@@ -3,12 +3,12 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/TrumpGuardBase.h"
 #include "FormationHicham/Gameplay/Characters/Enum/EAIStates.h"
 #include "FormationHicham/Gameplay/Characters/Enum/ETeam.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "TrumpGuardAIControllerBase.generated.h"
 
+class IEnemyInterface;
 class UAISenseConfig_Sight;
 
 UCLASS(Abstract, NotBlueprintable)
@@ -35,8 +35,8 @@ public:
 	bool IsPlayerSeen() const { return bIsPlayerSeen; }
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI|Initialize")
-	ATrumpGuardBase* TrumpGuardCharacter;
+	
+	IEnemyInterface* TrumpGuard;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI|Initialize")
 	UAISenseConfig_Sight* SightConfig;

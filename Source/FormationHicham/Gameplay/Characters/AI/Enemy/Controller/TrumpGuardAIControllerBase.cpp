@@ -1,10 +1,10 @@
 // TrumpGuardAIController.cpp
 #include "TrumpGuardAIControllerBase.h"
 
-#include "GameFramework/GameSession.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/Interfaces/EnemyInterface.h"
 
 ATrumpGuardAIControllerBase::ATrumpGuardAIControllerBase()
 {
@@ -29,11 +29,17 @@ void ATrumpGuardAIControllerBase::BeginPlay()
 void ATrumpGuardAIControllerBase::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	if (ATrumpGuardBase* TrumpGuard = Cast<ATrumpGuardBase>(InPawn))
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Black, InPawn->GetName() + ": Possess");
+
+	if (IEnemyInterface* Enemy = Cast<IEnemyInterface>(InPawn))
 	{
-		TrumpGuardCharacter = TrumpGuard;
+		TrumpGuard = Enemy;
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TrumpGuard->GetBehaviorTree()->GetName());
+
 		if (TrumpGuard->GetBehaviorTree())
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Enemy->_getUObject()->GetName());
+
 			BehaviorTree = TrumpGuard->GetBehaviorTree();
 			RunBehaviorTree(BehaviorTree);
 		}

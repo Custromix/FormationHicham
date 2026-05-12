@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/WidgetComponent.h"
+#include "FormationHicham/Gameplay/Characters/AI/Enemy/ACharacters/Interfaces/EnemyInterface.h"
 #include "FormationHicham/Gameplay/CommonComponents/HealthComponent/HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "TrumpGuardBase.generated.h"
@@ -11,7 +12,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackFinished, ATrumpGuardBase*, Attacker);
 
 UCLASS(Abstract)
-class FORMATIONHICHAM_API ATrumpGuardBase : public ACharacter
+class FORMATIONHICHAM_API ATrumpGuardBase : public ACharacter, public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -27,10 +28,10 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void WhenPlayerSeen();
-	void WhenPlayerUnseen();
+	void WhenPlayerSeen() override;
+	void WhenPlayerUnseen() override;
 
-	UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
+	UBehaviorTree* GetBehaviorTree() override { return BehaviorTree; }
 
 	UFUNCTION(BlueprintCallable, Category = "Attack AI")
 	virtual void StartAttack() {};
@@ -53,9 +54,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
 	UHealthComponent* HealthComponent;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	UBehaviorTree* BehaviorTree;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* AttackAnimMontage;
@@ -68,6 +66,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	int32 ScoreAfterKill = 10;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	UBehaviorTree* BehaviorTree;
 
 public:
 	UPROPERTY(BlueprintCallable, Category = "Attack AI")
